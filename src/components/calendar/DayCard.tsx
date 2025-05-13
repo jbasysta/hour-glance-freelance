@@ -30,7 +30,7 @@ export const DayCard: React.FC<DayCardProps> = ({ day, month, entries, onSelectD
   
   if (day === null) {
     return (
-      <Card className="invisible rounded-md flex flex-col p-2 relative" style={{ width: "110px", height: "150px" }}>
+      <Card className="invisible rounded-md flex flex-col p-2 relative min-h-[160px]">
         <CardContent className="p-0"></CardContent>
       </Card>
     );
@@ -79,6 +79,13 @@ export const DayCard: React.FC<DayCardProps> = ({ day, month, entries, onSelectD
 
   let cardClasses = "rounded-md flex flex-col p-2 relative";
   
+  // Adjust height based on mobile view
+  if (isMobile) {
+    cardClasses += " min-h-[120px]";
+  } else {
+    cardClasses += " aspect-square min-h-[160px]";
+  }
+  
   if (isToday) {
     cardClasses += " ring-2 ring-proxify-blue";
   }
@@ -92,7 +99,7 @@ export const DayCard: React.FC<DayCardProps> = ({ day, month, entries, onSelectD
   }
 
   return (
-    <Card className={cardClasses} style={{ width: "110px", height: "150px" }}>
+    <Card className={cardClasses}>
       <CardContent className="p-0 flex flex-col h-full justify-between">
         <div className="flex justify-between items-start">
           <span className="font-medium text-black">{day}</span>

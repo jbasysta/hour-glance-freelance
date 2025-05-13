@@ -123,10 +123,6 @@ const TimeEntryForm: React.FC<TimeEntryFormProps> = ({
                   <Label htmlFor="worked">Worked</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="missed" id="missed" />
-                  <Label htmlFor="missed">Missed</Label>
-                </div>
-                <div className="flex items-center space-x-2">
                   <RadioGroupItem value="day-off" id="day-off" />
                   <Label htmlFor="day-off">Day Off</Label>
                 </div>
