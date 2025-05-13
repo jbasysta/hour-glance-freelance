@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { DayEntry, TimeReport, Project, ReportStatus } from "@/types/time-tracker";
@@ -242,10 +241,17 @@ const TimeTracker = () => {
   });
 
   // Calculate summary data
-  const expectedHours = calculateExpectedHours(
-    currentMonth.getFullYear(), 
-    currentMonth.getMonth()
-  );
+  const expectedHours = selectedProject === "all" 
+    ? calculateExpectedHours(
+        currentMonth.getFullYear(), 
+        currentMonth.getMonth(),
+        8  // 8 hours per day when all projects selected
+      )
+    : calculateExpectedHours(
+        currentMonth.getFullYear(), 
+        currentMonth.getMonth(),
+        2  // 2 hours per day when single project selected
+      );
   
   const reportedHours = calculateReportedHours(currentMonthEntries);
   
@@ -254,7 +260,8 @@ const TimeTracker = () => {
   const summary = calculateMonthSummary(
     currentMonth.getFullYear(), 
     currentMonth.getMonth(), 
-    currentMonthEntries
+    currentMonthEntries,
+    expectedHours  // Pass the calculated expected hours to the summary function
   );
 
   // Find the existing time report for the current month

@@ -1,4 +1,3 @@
-
 import { DayEntry, TimeReport } from "@/types/time-tracker";
 import { MonthSummary } from "@/types/time-tracker";
 
@@ -42,9 +41,9 @@ export const getWeekdaysInMonth = (year: number, month: number): Date[] => {
   return getDaysInMonth(year, month).filter(isWeekday);
 };
 
-// Calculate expected hours in a month (2 hours per weekday per project)
-export const calculateExpectedHours = (year: number, month: number, projects = 1): number => {
-  return getWeekdaysInMonth(year, month).length * 2 * projects;
+// Calculate expected hours in a month (with configurable hours per day)
+export const calculateExpectedHours = (year: number, month: number, hoursPerDay = 2): number => {
+  return getWeekdaysInMonth(year, month).length * hoursPerDay;
 };
 
 // Calculate reported hours from entries
@@ -136,7 +135,7 @@ export const calculateMonthSummary = (
   year: number, 
   month: number, 
   entries: DayEntry[],
-  contractedHours = 176,
+  expectedHours?: number,
   monthlySalary = 3500,
   hourlyRate = 19.89
 ): MonthSummary => {
@@ -148,12 +147,15 @@ export const calculateMonthSummary = (
   const weekdaysInMonth = getWeekdaysInMonth(year, month);
   const contractedHoursValue = weekdaysInMonth.length * 2 * projectCount;
   
+  // Use provided expected hours or calculate based on contracted hours
+  const effectiveExpectedHours = expectedHours !== undefined ? expectedHours : contractedHoursValue;
+  
   // Calculate reported hours, only count "worked" status
   const reportedHours = entries.reduce((total, entry) => {
     return entry.status === "worked" ? total + entry.hours : total;
   }, 0);
   
-  const remainingHours = Math.max(0, contractedHoursValue - reportedHours);
+  const remainingHours = Math.max(0, effectiveExpectedHours - reportedHours);
   
   // Count missed days
   const missedDays = weekdaysInMonth.filter(date => {
@@ -171,21 +173,21 @@ export const calculateMonthSummary = (
   const dailyRate = monthlySalary / weekdaysInMonth.length;
   const missedDaysCost = -(missedDays * dailyRate);
   
-  const deviationHours = reportedHours - contractedHoursValue;
+  const deviationHours = reportedHours - effectiveExpectedHours;
   const deviationCost = -(deviationHours < 0 ? Math.abs(deviationHours) * hourlyRate : 0);
   
   // Formula for earned flex days
-  const earnedFlexDays = Math.max(0, 2 * (reportedHours / contractedHoursValue));
+  const earnedFlexDays = Math.max(0, 2 * (reportedHours / effectiveExpectedHours));
   
   const subtotal = missedDaysCost + deviationCost > 0 ? 
     monthlySalary + missedDaysCost + deviationCost : 
     monthlySalary + missedDaysCost + deviationCost;
 
   return {
-    expectedHours: contractedHoursValue,
+    expectedHours: effectiveExpectedHours,
     reportedHours,
     remainingHours,
-    contractedHours: contractedHoursValue, // Use the calculated contracted hours
+    contractedHours: contractedHoursValue, // Keep the contracted hours based on projects
     monthlySalary,
     missedDays,
     missedDaysCost,
