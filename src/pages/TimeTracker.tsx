@@ -36,6 +36,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import JSConfetti from 'js-confetti';
+import { Table, TableBody, TableRow, TableCell } from "@/components/ui/table";
 
 // Sample projects
 const SAMPLE_PROJECTS: Project[] = [
@@ -431,24 +432,26 @@ const TimeTracker = () => {
               <CardTitle>Month Summary</CardTitle>
             </CardHeader>
             <CardContent>
-              <dl className="space-y-2">
-                <div className="flex justify-between">
-                  <dt>Contracted Hours:</dt>
-                  <dd className="font-medium">{expectedHours}</dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt>Reported Hours:</dt>
-                  <dd className="font-medium">{reportedHours.toFixed(1)}</dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt>Remaining Hours:</dt>
-                  <dd className="font-medium">{remainingHours.toFixed(1)}</dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt>Earned Flex Days:</dt>
-                  <dd className="font-medium">{(2 * (reportedHours / expectedHours)).toFixed(1)}</dd>
-                </div>
-              </dl>
+              <Table>
+                <TableBody>
+                  <TableRow>
+                    <TableCell className="font-medium text-left">Contracted Hours:</TableCell>
+                    <TableCell className="text-right">{expectedHours}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className="font-medium text-left">Reported Hours:</TableCell>
+                    <TableCell className="text-right">{reportedHours.toFixed(1)}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className="font-medium text-left">Remaining Hours:</TableCell>
+                    <TableCell className="text-right">{remainingHours.toFixed(1)}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className="font-medium text-left">Earned Flex Days:</TableCell>
+                    <TableCell className="text-right">{(2 * (reportedHours / expectedHours)).toFixed(1)}</TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
               
               <Separator className="my-4" />
               

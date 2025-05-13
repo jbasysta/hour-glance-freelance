@@ -50,10 +50,7 @@ const PaymentSummary: React.FC<PaymentSummaryProps> = ({ summary, month }) => {
               </TableCell>
               <TableCell className="text-right">{formatCurrency(summary.deviationCost)}</TableCell>
             </TableRow>
-            <TableRow>
-              <TableCell className="font-medium text-left">Earned paid flex days</TableCell>
-              <TableCell className="text-right">{summary.earnedFlexDays} days</TableCell>
-            </TableRow>
+            {/* Removed the "Earned paid flex days" row */}
             <TableRow className="border-t-2">
               <TableCell className="font-medium text-lg text-left">Subtotal</TableCell>
               <TableCell className="text-right font-bold text-lg">
