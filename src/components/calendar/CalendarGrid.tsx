@@ -1,17 +1,26 @@
 
 import React from "react";
-import { DayEntry } from "@/types/time-tracker";
+import { DayEntry, ReportStatus } from "@/types/time-tracker";
 import { DayCard } from "./DayCard";
 import { DayHeader } from "./DayHeader";
 
 interface CalendarGridProps {
   month: Date;
-  entries: DayEntry[];
+  entries?: DayEntry[];
   onSelectDay: (date: Date) => void;
   isMobile?: boolean;
+  reportStatus: ReportStatus;
+  children?: (day: number | null, dayIndex: number) => React.ReactNode;
 }
 
-const CalendarGrid: React.FC<CalendarGridProps> = ({ month, entries, onSelectDay, isMobile = false }) => {
+const CalendarGrid: React.FC<CalendarGridProps> = ({ 
+  month, 
+  entries = [], 
+  onSelectDay, 
+  isMobile = false,
+  reportStatus,
+  children 
+}) => {
   const daysInMonth = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
   const firstDayOfMonth = new Date(month.getFullYear(), month.getMonth(), 1).getDay();
   const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
@@ -36,13 +45,16 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({ month, entries, onSelectDay
           {Array.from({ length: Math.ceil(calendar.length / 7) }).map((_, weekIndex) => (
             <div key={`week-${weekIndex}`} className="grid grid-cols-7 gap-3">
               {calendar.slice(weekIndex * 7, weekIndex * 7 + 7).map((day, dayIndex) => (
-                <DayCard
-                  key={`day-${weekIndex}-${dayIndex}`}
-                  day={day}
-                  month={month}
-                  entries={entries}
-                  onSelectDay={onSelectDay}
-                />
+                children ? 
+                  children(day as number | null, weekIndex * 7 + dayIndex) :
+                  <DayCard
+                    key={`day-${weekIndex}-${dayIndex}`}
+                    day={day}
+                    month={month}
+                    entries={entries}
+                    onSelectDay={onSelectDay}
+                    reportStatus={reportStatus}
+                  />
               ))}
             </div>
           ))}
@@ -62,13 +74,16 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({ month, entries, onSelectDay
       
       <div className="grid grid-cols-7 gap-3">
         {calendar.map((day, index) => (
-          <DayCard
-            key={`day-${index}`}
-            day={day}
-            month={month}
-            entries={entries}
-            onSelectDay={onSelectDay}
-          />
+          children ? 
+            children(day as number | null, index) : 
+            <DayCard
+              key={`day-${index}`}
+              day={day}
+              month={month}
+              entries={entries}
+              onSelectDay={onSelectDay}
+              reportStatus={reportStatus}
+            />
         ))}
       </div>
     </div>

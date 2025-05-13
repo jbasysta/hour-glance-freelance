@@ -26,7 +26,12 @@ const Calendar: React.FC<CalendarProps> = ({ month, entries, onSelectDay, report
       </div>
 
       {/* Calendar grid with days */}
-      <CalendarGrid month={month}>
+      <CalendarGrid 
+        month={month} 
+        entries={entries}
+        onSelectDay={onSelectDay}
+        reportStatus={reportStatus}
+      >
         {(day, dayIndex) => (
           <DayCard 
             key={dayIndex} 
