@@ -41,12 +41,6 @@ const PaymentSummary: React.FC<PaymentSummaryProps> = ({ summary, month }) => {
             </TableRow>
             <TableRow>
               <TableCell className="font-medium text-left">
-                Not worked days ({summary.missedDays} days @ {formatCurrency(summary.monthlySalary / 22)} /day)
-              </TableCell>
-              <TableCell className="text-right">{formatCurrency(summary.missedDaysCost)}</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell className="font-medium text-left">
                 Working time deviation ({summary.deviationHours} hours @ {formatCurrency(summary.hourlyRate)} /hour)
               </TableCell>
               <TableCell className="text-right">{formatCurrency(summary.deviationCost)}</TableCell>

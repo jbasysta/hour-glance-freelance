@@ -302,7 +302,16 @@ const TimeTracker = () => {
     return isCurrentMonth && entry.projectId === selectedProject;
   });
 
-  // Calculate summary data
+  // Get the total number of projects for current month
+  const uniqueProjects = [...new Set(entries
+    .filter(entry => 
+      entry.date.getMonth() === currentMonth.getMonth() && 
+      entry.date.getFullYear() === currentMonth.getFullYear()
+    )
+    .map(entry => entry.projectId))];
+  const projectCount = uniqueProjects.length || 1;
+
+  // Calculate expected hours based on project selection
   const expectedHours = selectedProject === "all" 
     ? calculateExpectedHours(
         currentMonth.getFullYear(), 
@@ -312,18 +321,24 @@ const TimeTracker = () => {
     : calculateExpectedHours(
         currentMonth.getFullYear(), 
         currentMonth.getMonth(),
-        2  // 2 hours per day when single project selected
+        8 / projectCount  // Divide 8 hours per day by number of projects
       );
   
   const reportedHours = calculateReportedHours(currentMonthEntries);
   
   const remainingHours = Math.max(0, expectedHours - reportedHours);
   
+  // Calculate monthly salary based on project selection
+  const monthlySalary = selectedProject === "all" 
+    ? 3500 
+    : 3500 / projectCount;
+  
   const summary = calculateMonthSummary(
     currentMonth.getFullYear(), 
     currentMonth.getMonth(), 
     currentMonthEntries,
-    expectedHours  // Pass the calculated expected hours to the summary function
+    expectedHours,  // Pass the calculated expected hours to the summary function
+    monthlySalary   // Pass the calculated monthly salary
   );
 
   // Find the existing time report for the current month

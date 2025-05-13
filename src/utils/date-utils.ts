@@ -157,31 +157,15 @@ export const calculateMonthSummary = (
   
   const remainingHours = Math.max(0, effectiveExpectedHours - reportedHours);
   
-  // Count missed days
-  const missedDays = weekdaysInMonth.filter(date => {
-    const dayEntries = entries.filter(e => 
-      e.date.getFullYear() === date.getFullYear() &&
-      e.date.getMonth() === date.getMonth() &&
-      e.date.getDate() === date.getDate()
-    );
-    
-    // A day is missed if there are no entries or all entries are "missed"
-    return dayEntries.length === 0 || 
-           dayEntries.every(entry => entry.status === "missed");
-  }).length;
-  
-  const dailyRate = monthlySalary / weekdaysInMonth.length;
-  const missedDaysCost = -(missedDays * dailyRate);
-  
+  // Calculate deviationHours and deviationCost
   const deviationHours = reportedHours - effectiveExpectedHours;
   const deviationCost = -(deviationHours < 0 ? Math.abs(deviationHours) * hourlyRate : 0);
   
   // Formula for earned flex days
   const earnedFlexDays = Math.max(0, 2 * (reportedHours / effectiveExpectedHours));
   
-  const subtotal = missedDaysCost + deviationCost > 0 ? 
-    monthlySalary + missedDaysCost + deviationCost : 
-    monthlySalary + missedDaysCost + deviationCost;
+  // Simplified subtotal calculation without missedDaysCost
+  const subtotal = monthlySalary + deviationCost;
 
   return {
     expectedHours: effectiveExpectedHours,
@@ -189,8 +173,8 @@ export const calculateMonthSummary = (
     remainingHours,
     contractedHours: contractedHoursValue, // Keep the contracted hours based on projects
     monthlySalary,
-    missedDays,
-    missedDaysCost,
+    missedDays: 0, // Keep this property but set to 0 since we're not using it
+    missedDaysCost: 0, // Keep this property but set to 0 since we're not using it
     hourlyRate,
     deviationHours,
     deviationCost,
