@@ -12,8 +12,7 @@ import {
   CheckIcon,
   XIcon,
   ClockIcon,
-  CalendarIcon,
-  LockIcon
+  CalendarIcon
 } from "lucide-react";
 import { DayStatusBadge } from "./DayStatusBadge";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
@@ -120,9 +119,6 @@ export const DayCard: React.FC<DayCardProps> = ({ day, month, entries, onSelectD
       <CardContent className="p-0 flex flex-col h-full justify-between">
         <div className="flex justify-between items-start">
           <span className="font-medium text-black">{day}</span>
-          {isLocked && !isFuture ? (
-            <LockIcon className="h-3 w-3 text-gray-400" />
-          ) : null}
           {(dayEntries.length > 0 || isMissed) && (
             <DayStatusBadge 
               isMissed={isMissed} 
