@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { DayStatusBadge } from "./DayStatusBadge";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface DayCardProps {
   day: number | null;
@@ -25,6 +26,8 @@ interface DayCardProps {
 }
 
 export const DayCard: React.FC<DayCardProps> = ({ day, month, entries, onSelectDay }) => {
+  const isMobile = useIsMobile();
+  
   if (day === null) {
     return (
       <Card className="invisible aspect-square rounded-md flex flex-col p-2 relative min-h-[160px]">
@@ -74,7 +77,14 @@ export const DayCard: React.FC<DayCardProps> = ({ day, month, entries, onSelectD
     return dayEntries.length === 0 || dayEntries.every(entry => entry.status === "missed");
   }
 
-  let cardClasses = "aspect-square rounded-md flex flex-col p-2 relative min-h-[160px]";
+  let cardClasses = "rounded-md flex flex-col p-2 relative";
+  
+  // Adjust height based on mobile view
+  if (isMobile) {
+    cardClasses += " min-h-[120px]";
+  } else {
+    cardClasses += " aspect-square min-h-[160px]";
+  }
   
   if (isToday) {
     cardClasses += " ring-2 ring-proxify-blue";
@@ -129,6 +139,7 @@ export const DayCard: React.FC<DayCardProps> = ({ day, month, entries, onSelectD
           className="mt-auto w-full h-6 justify-center text-proxify-blue bg-proxify-lavender/10 hover:bg-proxify-blue hover:text-white"
           onClick={() => onSelectDay(date)}
           disabled={isFuture}
+          style={{ height: "24px" }}
         >
           {dayEntries.length > 0 ? "Edit" : "Add"}
         </Button>
