@@ -2,7 +2,7 @@
 import React from "react";
 import { MonthSummary } from "@/types/time-tracker";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
+import { Table, TableBody, TableRow, TableCell } from "@/components/ui/table";
 
 interface PaymentSummaryProps {
   summary: MonthSummary;
@@ -29,7 +29,7 @@ const PaymentSummary: React.FC<PaymentSummaryProps> = ({ summary, month }) => {
           <TableBody>
             <TableRow>
               <TableCell className="font-medium text-left">Contracted hours</TableCell>
-              <TableCell className="text-right">{summary.contractedHours}</TableCell>
+              <TableCell className="text-right">{summary.expectedHours}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell className="font-medium text-left">Total hours</TableCell>
