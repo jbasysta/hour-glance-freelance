@@ -50,6 +50,9 @@ export const DayCard: React.FC<DayCardProps> = ({ day, month, entries, onSelectD
   
   // Get unique statuses from entries
   const statuses = [...new Set(dayEntries.map(entry => entry.status))];
+  const hasNonWorkedStatuses = dayEntries.some(entry => 
+    entry.status === "missed" || entry.status === "day-off" || entry.status === "suspended-client"
+  );
 
   function getDayEntries(): DayEntry[] {
     return entries.filter(entry => 
@@ -62,11 +65,15 @@ export const DayCard: React.FC<DayCardProps> = ({ day, month, entries, onSelectD
   function isLessThanExpected(): boolean {
     if (dayEntries.length === 0) return false;
     
+    // Calculate expected hours: 2 hours per project per day (weekday only)
+    const uniqueProjects = [...new Set(dayEntries.map(entry => entry.projectId))];
+    const expectedHours = isWeekday(date) ? uniqueProjects.length * 2 : 0;
+    
     const totalHours = dayEntries.reduce((total, entry) => {
       return entry.status === "worked" ? total + entry.hours : total;
     }, 0);
     
-    return isWeekday(date) && totalHours > 0 && totalHours < 8;
+    return isWeekday(date) && totalHours > 0 && expectedHours > 0 && totalHours < expectedHours;
   }
   
   function shouldMarkAsMissed(): boolean {
