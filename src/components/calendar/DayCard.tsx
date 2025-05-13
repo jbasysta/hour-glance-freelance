@@ -19,6 +19,7 @@ import { DayStatusBadge } from "./DayStatusBadge";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface DayCardProps {
   day: number | null;
@@ -47,6 +48,7 @@ export const DayCard: React.FC<DayCardProps> = ({ day, month, entries, onSelectD
   const lessHours = isLessThanExpected();
   const isMissed = shouldMarkAsMissed();
   const isLocked = reportStatus !== "declined" && reportStatus !== "upcoming";
+  const isLessThan8Hours = totalHours > 0 && totalHours < 8 && isWeekday(date);
   
   // Updated to handle cases where entries have non-worked statuses (should show 0 hours)
   const totalHours = dayEntries.reduce((total, entry) => {
@@ -133,7 +135,25 @@ export const DayCard: React.FC<DayCardProps> = ({ day, month, entries, onSelectD
         
         {shouldShowHours && (
           <div className="mt-1 text-center">
-            <span className="text-lg font-bold text-black">{totalHours}h</span>
+            <div className="flex items-center justify-center">
+              <span className="text-lg font-bold text-black">{totalHours}h</span>
+              
+              {/* Add the warning icon for less than 8 hours */}
+              {isLessThan8Hours && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="ml-1 cursor-help">
+                        <AlertTriangleIcon className="h-4 w-4 text-amber-500" />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="text-xs">Reporting less than 8 hours for this day</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+            </div>
             
             {/* Underreported hours indicator in orange */}
             {lessHours && (
