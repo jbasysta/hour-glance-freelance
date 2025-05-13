@@ -1,31 +1,53 @@
-
 import React, { useState, useEffect } from "react";
 import { format } from "date-fns";
-import { DayEntry } from "@/types/time-tracker";
+import { DayEntry, TimeReport, Project, ReportStatus } from "@/types/time-tracker";
 import { 
   calculateMonthSummary, 
   formatMonthYear,
   calculateExpectedHours,
-  calculateReportedHours
+  calculateReportedHours,
+  autopopulatePreviousMonths
 } from "@/utils/date-utils";
 import Calendar from "@/components/Calendar";
 import TimeEntryForm from "@/components/TimeEntryForm";
 import PaymentSummary from "@/components/PaymentSummary";
+import TimeReportStatus from "@/components/TimeReportStatus";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { toast } from "@/components/ui/use-toast";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { ArrowLeft, ArrowRight, Plus } from "lucide-react";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
+
+// Sample projects
+const SAMPLE_PROJECTS: Project[] = [
+  { id: "p1", name: "Main Project" },
+  { id: "p2", name: "Side Project" },
+  { id: "p3", name: "Client X" },
+  { id: "p4", name: "Training" }
+];
 
 const TimeTracker = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [entries, setEntries] = useState<DayEntry[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [projects] = useState<Project[]>(SAMPLE_PROJECTS);
+  const [timeReports, setTimeReports] = useState<TimeReport[]>([]);
+  const [selectedProject, setSelectedProject] = useState<string>("all");
+  const { toast } = useToast();
 
   // Load entries from localStorage on component mount
   useEffect(() => {
     const storedEntries = localStorage.getItem('timeEntries');
+    const storedReports = localStorage.getItem('timeReports');
+    
     if (storedEntries) {
       try {
         const parsedEntries = JSON.parse(storedEntries).map((entry: any) => ({
@@ -37,12 +59,36 @@ const TimeTracker = () => {
         console.error('Error parsing stored entries:', error);
       }
     }
+    
+    if (storedReports) {
+      try {
+        const parsedReports = JSON.parse(storedReports);
+        setTimeReports(parsedReports);
+      } catch (error) {
+        console.error('Error parsing stored reports:', error);
+      }
+    }
   }, []);
+
+  // Auto-populate previous months on initial load
+  useEffect(() => {
+    if (entries.length > 0 && projects.length > 0) {
+      const populatedEntries = autopopulatePreviousMonths(entries, projects);
+      if (populatedEntries.length !== entries.length) {
+        setEntries(populatedEntries);
+      }
+    }
+  }, [entries, projects]);
 
   // Save entries to localStorage when they change
   useEffect(() => {
     localStorage.setItem('timeEntries', JSON.stringify(entries));
   }, [entries]);
+
+  // Save time reports to localStorage when they change
+  useEffect(() => {
+    localStorage.setItem('timeReports', JSON.stringify(timeReports));
+  }, [timeReports]);
 
   const navigateMonth = (direction: 'prev' | 'next') => {
     setCurrentMonth(prevMonth => {
@@ -63,9 +109,10 @@ const TimeTracker = () => {
 
   const handleSaveEntry = (entry: DayEntry) => {
     setEntries(prevEntries => {
-      // Find if an entry already exists for this date
+      // Find if an entry already exists for this date and project
       const existingEntryIndex = prevEntries.findIndex(
-        e => e.date.toDateString() === entry.date.toDateString()
+        e => e.date.toDateString() === entry.date.toDateString() && 
+             e.projectId === entry.projectId
       );
 
       if (existingEntryIndex >= 0) {
@@ -82,22 +129,41 @@ const TimeTracker = () => {
     toast({
       title: "Time Entry Saved",
       description: `Your time entry for ${format(entry.date, 'MMMM d, yyyy')} has been saved.`,
+      className: "bg-[#F2FCE2] text-[#1A1F2C] border-green-200"
     });
   };
 
   const submitTimeReport = () => {
-    // This would typically send the data to a backend
+    // Create a new time report for the current month
+    const newReport: TimeReport = {
+      month: currentMonth.getMonth(),
+      year: currentMonth.getFullYear(),
+      reportStatus: "pending-approval",
+      submittedAt: new Date()
+    };
+    
+    setTimeReports(prev => [...prev, newReport]);
+    
     toast({
       title: "Time Report Submitted",
-      description: `Your time report for ${formatMonthYear(currentMonth)} has been submitted.`,
+      description: `Your time report for ${formatMonthYear(currentMonth)} has been submitted and is pending approval.`,
+      className: "bg-[#F2FCE2] text-[#1A1F2C] border-green-200"
     });
   };
 
-  // Filter entries for the current month
-  const currentMonthEntries = entries.filter(entry => 
-    entry.date.getMonth() === currentMonth.getMonth() && 
-    entry.date.getFullYear() === currentMonth.getFullYear()
-  );
+  // Filter entries for the current month and selected project
+  const currentMonthEntries = entries.filter(entry => {
+    const isCurrentMonth = entry.date.getMonth() === currentMonth.getMonth() && 
+                           entry.date.getFullYear() === currentMonth.getFullYear();
+    
+    // If "all" is selected, show all projects
+    if (selectedProject === "all") {
+      return isCurrentMonth;
+    }
+    
+    // Otherwise filter by project
+    return isCurrentMonth && entry.projectId === selectedProject;
+  });
 
   // Calculate summary data
   const expectedHours = calculateExpectedHours(
@@ -115,10 +181,22 @@ const TimeTracker = () => {
     currentMonthEntries
   );
 
-  // Find the existing entry for the selected date
-  const existingEntry = selectedDate 
-    ? entries.find(e => e.date.toDateString() === selectedDate.toDateString()) 
-    : undefined;
+  // Find the existing time report for the current month
+  const currentMonthReport = timeReports.find(
+    r => r.month === currentMonth.getMonth() && r.year === currentMonth.getFullYear()
+  );
+
+  // Get report status for the current month
+  const reportStatus: ReportStatus = currentMonthReport?.reportStatus || "upcoming";
+
+  // Find the existing entries for the selected date
+  const existingEntries = selectedDate 
+    ? entries.filter(e => e.date.toDateString() === selectedDate.toDateString()) 
+    : [];
+  
+  // If there are multiple entries for the same date but different projects,
+  // we'll edit the first one or create a new one
+  const existingEntry = existingEntries[0];
 
   return (
     <div className="container mx-auto py-8">
@@ -128,7 +206,10 @@ const TimeTracker = () => {
         <div className="md:col-span-2">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>{formatMonthYear(currentMonth)}</CardTitle>
+              <div className="flex items-center space-x-4">
+                <CardTitle>{formatMonthYear(currentMonth)}</CardTitle>
+                <TimeReportStatus status={reportStatus} />
+              </div>
               <div className="flex items-center space-x-2">
                 <Button 
                   variant="outline" 
@@ -147,11 +228,39 @@ const TimeTracker = () => {
               </div>
             </CardHeader>
             <CardContent>
+              <div className="mb-4">
+                <Select value={selectedProject} onValueChange={setSelectedProject}>
+                  <SelectTrigger className="w-[200px]">
+                    <SelectValue placeholder="Filter by project" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Projects</SelectItem>
+                    {projects.map(project => (
+                      <SelectItem key={project.id} value={project.id}>
+                        {project.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
               <Calendar 
                 month={currentMonth} 
                 entries={currentMonthEntries} 
                 onSelectDay={handleDaySelect} 
               />
+              
+              <div className="mt-4 flex justify-end">
+                <Button 
+                  onClick={() => {
+                    setSelectedDate(new Date());
+                    setDialogOpen(true);
+                  }}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Time Entry
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -182,14 +291,20 @@ const TimeTracker = () => {
               <Button 
                 className="w-full" 
                 onClick={submitTimeReport}
-                disabled={reportedHours < expectedHours}
+                disabled={reportedHours < expectedHours || reportStatus !== "upcoming"}
               >
                 Submit Time Report
               </Button>
               
-              {reportedHours < expectedHours && (
+              {reportedHours < expectedHours && reportStatus === "upcoming" && (
                 <p className="text-xs text-muted-foreground mt-2">
                   You need to report {remainingHours.toFixed(1)} more hours before submitting.
+                </p>
+              )}
+              
+              {reportStatus !== "upcoming" && (
+                <p className="text-xs text-muted-foreground mt-2">
+                  This report has already been submitted.
                 </p>
               )}
             </CardContent>
@@ -208,6 +323,7 @@ const TimeTracker = () => {
         date={selectedDate}
         onSave={handleSaveEntry}
         existingEntry={existingEntry}
+        projects={projects}
       />
     </div>
   );

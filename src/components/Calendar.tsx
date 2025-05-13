@@ -1,10 +1,11 @@
+
 import React from "react";
 import { DayEntry, CheckInStatus } from "@/types/time-tracker";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { formatDayOfMonth, isWeekday } from "@/utils/date-utils";
-import { ClockIcon, AlertTriangleIcon } from "lucide-react";
+import { formatDayOfMonth, isWeekday, isFutureDate } from "@/utils/date-utils";
+import { AlertTriangleIcon, BriefcaseIcon } from "lucide-react";
 
 interface CalendarProps {
   month: Date;
@@ -21,11 +22,11 @@ const Calendar: React.FC<CalendarProps> = ({ month, entries, onSelectDay }) => {
   // Create calendar array with proper padding for the first week
   const calendar = [...Array(emptyDays).fill(null), ...days];
   
-  const getEntryForDay = (day: number | null): DayEntry | undefined => {
-    if (day === null) return undefined;
+  const getEntriesForDay = (day: number | null): DayEntry[] => {
+    if (day === null) return [];
     
     const date = new Date(month.getFullYear(), month.getMonth(), day);
-    return entries.find(entry => 
+    return entries.filter(entry => 
       entry.date.getFullYear() === date.getFullYear() &&
       entry.date.getMonth() === date.getMonth() &&
       entry.date.getDate() === date.getDate()
@@ -48,6 +49,7 @@ const Calendar: React.FC<CalendarProps> = ({ month, entries, onSelectDay }) => {
     const date = new Date(month.getFullYear(), month.getMonth(), day);
     const isToday = new Date().toDateString() === date.toDateString();
     const isWeekend = !isWeekday(date);
+    const isFuture = isFutureDate(date);
     
     let classes = "aspect-square rounded-md flex flex-col p-2 relative";
     
@@ -57,6 +59,8 @@ const Calendar: React.FC<CalendarProps> = ({ month, entries, onSelectDay }) => {
     
     if (isWeekend) {
       classes += " bg-gray-100";
+    } else if (isFuture) {
+      classes += " bg-gray-50";
     } else {
       classes += " bg-white";
     }
@@ -64,10 +68,15 @@ const Calendar: React.FC<CalendarProps> = ({ month, entries, onSelectDay }) => {
     return classes;
   };
 
-  // New function to check if hours are less than expected
-  const isLessThanExpected = (entry: DayEntry | undefined, date: Date | null): boolean => {
-    if (!entry || !date || entry.status !== "worked") return false;
-    return isWeekday(date) && entry.hours < 8;
+  // Check if hours are less than expected
+  const isLessThanExpected = (dayEntries: DayEntry[], date: Date | null): boolean => {
+    if (dayEntries.length === 0 || !date) return false;
+    
+    const totalHours = dayEntries.reduce((total, entry) => {
+      return entry.status === "worked" ? total + entry.hours : total;
+    }, 0);
+    
+    return isWeekday(date) && totalHours > 0 && totalHours < 8;
   };
 
   return (
@@ -79,9 +88,17 @@ const Calendar: React.FC<CalendarProps> = ({ month, entries, onSelectDay }) => {
       ))}
       
       {calendar.map((day, index) => {
-        const entry = getEntryForDay(day);
+        const dayEntries = getEntriesForDay(day);
         const date = day ? new Date(month.getFullYear(), month.getMonth(), day) : null;
-        const lessHours = isLessThanExpected(entry, date);
+        const lessHours = isLessThanExpected(dayEntries, date);
+        const isFuture = date ? isFutureDate(date) : false;
+        
+        const totalHours = dayEntries.reduce((total, entry) => {
+          return entry.status === "worked" ? total + entry.hours : total;
+        }, 0);
+        
+        // Get unique statuses from entries
+        const statuses = [...new Set(dayEntries.map(entry => entry.status))];
         
         return (
           <Card 
@@ -91,16 +108,26 @@ const Calendar: React.FC<CalendarProps> = ({ month, entries, onSelectDay }) => {
             <CardContent className="p-0 flex flex-col h-full justify-between">
               <div className="flex justify-between items-start">
                 <span className="font-medium">{day}</span>
-                {entry && (
-                  <Badge className={getStatusColor(entry.status)}>
-                    {entry.status}
+                {dayEntries.length > 0 && statuses.length === 1 && (
+                  <Badge className={getStatusColor(statuses[0])}>
+                    {statuses[0]}
                   </Badge>
+                )}
+                {dayEntries.length > 0 && statuses.length > 1 && (
+                  <Badge className="bg-blue-500">multiple</Badge>
                 )}
               </div>
               
-              {entry && entry.status === "worked" && (
+              {dayEntries.length > 0 && dayEntries.some(e => e.status === "worked") && (
                 <div className="mt-2 text-center relative">
-                  <span className="text-lg font-bold">{entry.hours}h</span>
+                  <span className="text-lg font-bold">{totalHours}h</span>
+                  
+                  {dayEntries.length > 1 && (
+                    <div className="flex items-center justify-center mt-1 text-blue-600">
+                      <BriefcaseIcon className="h-4 w-4 mr-1" />
+                      <span className="text-xs">{dayEntries.length} projects</span>
+                    </div>
+                  )}
                   
                   {/* Add indicator for less than expected hours */}
                   {lessHours && (
@@ -118,8 +145,9 @@ const Calendar: React.FC<CalendarProps> = ({ month, entries, onSelectDay }) => {
                   size="sm" 
                   className="mt-auto w-full justify-center"
                   onClick={() => date && onSelectDay(date)}
+                  disabled={isFuture}
                 >
-                  {entry ? "Edit" : "Add"}
+                  {dayEntries.length > 0 ? "Edit" : "Add"}
                 </Button>
               )}
             </CardContent>
