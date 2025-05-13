@@ -45,15 +45,16 @@ export const DayCard: React.FC<DayCardProps> = ({ day, month, entries, onSelectD
   const isWeekend = !isWeekday(date);
   const isFuture = isFutureDate(date);
   const dayEntries = getDayEntries();
+  
+  // Move the totalHours calculation here, before it's used in isLessThan8Hours
+  const totalHours = dayEntries.reduce((total, entry) => {
+    return entry.status === "worked" ? total + entry.hours : total;
+  }, 0);
+  
   const lessHours = isLessThanExpected();
   const isMissed = shouldMarkAsMissed();
   const isLocked = reportStatus !== "declined" && reportStatus !== "upcoming";
   const isLessThan8Hours = totalHours > 0 && totalHours < 8 && isWeekday(date);
-  
-  // Updated to handle cases where entries have non-worked statuses (should show 0 hours)
-  const totalHours = dayEntries.reduce((total, entry) => {
-    return entry.status === "worked" ? total + entry.hours : total;
-  }, 0);
   
   // Get unique statuses from entries
   const statuses = [...new Set(dayEntries.map(entry => entry.status))];
