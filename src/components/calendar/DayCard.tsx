@@ -46,11 +46,12 @@ export const DayCard: React.FC<DayCardProps> = ({ day, month, entries, onSelectD
   const isFuture = isFutureDate(date);
   const dayEntries = getDayEntries();
   
-  // Move the totalHours calculation here, before it's used in isLessThan8Hours
+  // Calculate totalHours first since it's used in multiple places
   const totalHours = dayEntries.reduce((total, entry) => {
     return entry.status === "worked" ? total + entry.hours : total;
   }, 0);
   
+  // Now we can safely use totalHours in these functions
   const lessHours = isLessThanExpected();
   const isMissed = shouldMarkAsMissed();
   const isLocked = reportStatus !== "declined" && reportStatus !== "upcoming";
@@ -77,10 +78,7 @@ export const DayCard: React.FC<DayCardProps> = ({ day, month, entries, onSelectD
     const uniqueProjects = [...new Set(dayEntries.map(entry => entry.projectId))];
     const expectedHours = isWeekday(date) ? uniqueProjects.length * 2 : 0;
     
-    const totalHours = dayEntries.reduce((total, entry) => {
-      return entry.status === "worked" ? total + entry.hours : total;
-    }, 0);
-    
+    // Use the already calculated totalHours value instead of recalculating it
     return isWeekday(date) && totalHours > 0 && expectedHours > 0 && totalHours < expectedHours;
   }
   
