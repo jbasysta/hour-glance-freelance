@@ -13,6 +13,7 @@ export interface DayEntry {
   status: CheckInStatus;
   projectId: string;
   projectName: string;
+  notes?: string;
 }
 
 export interface TimeReport {

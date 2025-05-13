@@ -1,4 +1,3 @@
-
 import { DayEntry, TimeReport } from "@/types/time-tracker";
 import { MonthSummary } from "@/types/time-tracker";
 
@@ -14,6 +13,15 @@ export const isFutureDate = (date: Date): boolean => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   return date > today;
+};
+
+// Check if date is in the past
+export const isPastDate = (date: Date): boolean => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const compareDate = new Date(date);
+  compareDate.setHours(0, 0, 0, 0);
+  return compareDate < today;
 };
 
 // Get all days in a month

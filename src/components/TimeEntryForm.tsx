@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { isWeekday, isFutureDate } from "@/utils/date-utils";
 
 interface TimeEntryFormProps {
@@ -38,6 +39,7 @@ const TimeEntryForm: React.FC<TimeEntryFormProps> = ({
     existingEntry?.status || (date ? (isWeekday(date) ? "worked" : "day-off") : "worked")
   );
   const [projectId, setProjectId] = useState<string>(existingEntry?.projectId || (projects[0]?.id || ""));
+  const [notes, setNotes] = useState<string>(existingEntry?.notes || "");
   
   const isFuture = date ? isFutureDate(date) : false;
 
@@ -46,10 +48,12 @@ const TimeEntryForm: React.FC<TimeEntryFormProps> = ({
       setHours(existingEntry.hours);
       setStatus(existingEntry.status);
       setProjectId(existingEntry.projectId);
+      setNotes(existingEntry.notes || "");
     } else if (date) {
       setHours(8);
       setStatus(isWeekday(date) ? "worked" : "day-off");
       setProjectId(projects[0]?.id || "");
+      setNotes("");
     }
   }, [existingEntry, date, projects]);
 
@@ -63,7 +67,8 @@ const TimeEntryForm: React.FC<TimeEntryFormProps> = ({
       hours: status === "worked" ? hours : 0,
       status,
       projectId: selectedProject.id,
-      projectName: selectedProject.name
+      projectName: selectedProject.name,
+      notes: notes.trim() !== "" ? notes : undefined
     });
     
     onOpenChange(false);
@@ -147,6 +152,18 @@ const TimeEntryForm: React.FC<TimeEntryFormProps> = ({
                 />
               </div>
             )}
+            
+            <div className="space-y-2">
+              <Label htmlFor="notes">Check-in Goals</Label>
+              <Textarea
+                id="notes"
+                placeholder="What did you accomplish today?"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                disabled={isFuture}
+                className="min-h-[100px]"
+              />
+            </div>
           </div>
         )}
         

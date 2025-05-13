@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { DayEntry, TimeReport, Project, ReportStatus } from "@/types/time-tracker";
@@ -16,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, ArrowRight, Plus } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { 
   Select,
   SelectContent,
@@ -69,6 +70,39 @@ const TimeTracker = () => {
       }
     }
   }, []);
+
+  // Add predefined report statuses for March and April
+  useEffect(() => {
+    const currentYear = new Date().getFullYear();
+    
+    // Check if March report exists, if not, add it
+    const marchReport = timeReports.find(
+      r => r.month === 2 && r.year === currentYear
+    );
+    
+    if (!marchReport) {
+      setTimeReports(prev => [...prev, {
+        month: 2, // March (0-indexed)
+        year: currentYear,
+        reportStatus: "declined",
+        submittedAt: new Date(currentYear, 2, 31)
+      }]);
+    }
+    
+    // Check if April report exists, if not, add it
+    const aprilReport = timeReports.find(
+      r => r.month === 3 && r.year === currentYear
+    );
+    
+    if (!aprilReport) {
+      setTimeReports(prev => [...prev, {
+        month: 3, // April (0-indexed)
+        year: currentYear,
+        reportStatus: "pending-approval",
+        submittedAt: new Date(currentYear, 3, 30)
+      }]);
+    }
+  }, [timeReports]);
 
   // Auto-populate previous months on initial load
   useEffect(() => {
@@ -142,7 +176,22 @@ const TimeTracker = () => {
       submittedAt: new Date()
     };
     
-    setTimeReports(prev => [...prev, newReport]);
+    setTimeReports(prev => {
+      // Check if report for this month already exists
+      const existingReportIndex = prev.findIndex(
+        r => r.month === currentMonth.getMonth() && r.year === currentMonth.getFullYear()
+      );
+      
+      if (existingReportIndex >= 0) {
+        // Update existing report
+        const newReports = [...prev];
+        newReports[existingReportIndex] = newReport;
+        return newReports;
+      } else {
+        // Add new report
+        return [...prev, newReport];
+      }
+    });
     
     toast({
       title: "Time Report Submitted",
@@ -249,18 +298,6 @@ const TimeTracker = () => {
                 entries={currentMonthEntries} 
                 onSelectDay={handleDaySelect} 
               />
-              
-              <div className="mt-4 flex justify-end">
-                <Button 
-                  onClick={() => {
-                    setSelectedDate(new Date());
-                    setDialogOpen(true);
-                  }}
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Time Entry
-                </Button>
-              </div>
             </CardContent>
           </Card>
         </div>
@@ -283,6 +320,10 @@ const TimeTracker = () => {
                 <div className="flex justify-between">
                   <dt>Remaining Hours:</dt>
                   <dd className="font-medium">{remainingHours.toFixed(1)}</dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt>Earned Flex Days:</dt>
+                  <dd className="font-medium">{(2 * (reportedHours / expectedHours)).toFixed(1)}</dd>
                 </div>
               </dl>
               

@@ -4,8 +4,21 @@ import { DayEntry, CheckInStatus } from "@/types/time-tracker";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { formatDayOfMonth, isWeekday, isFutureDate } from "@/utils/date-utils";
-import { AlertTriangleIcon, BriefcaseIcon } from "lucide-react";
+import { formatDayOfMonth, isWeekday, isFutureDate, isPastDate } from "@/utils/date-utils";
+import { 
+  AlertTriangleIcon, 
+  BriefcaseIcon, 
+  InfoIcon,
+  CheckIcon,
+  XIcon,
+  ClockIcon,
+  CalendarIcon
+} from "lucide-react";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 
 interface CalendarProps {
   month: Date;
@@ -38,8 +51,18 @@ const Calendar: React.FC<CalendarProps> = ({ month, entries, onSelectDay }) => {
       case "worked": return "bg-proxify-green text-white";
       case "missed": return "bg-red-500 text-white";
       case "day-off": return "bg-gray-300 text-gray-800";
-      case "suspended-client": return "bg-proxify-yellow text-gray-800";
+      case "suspended-client": return "bg-proxify-yellow text-black";
       default: return "bg-gray-200 text-gray-800";
+    }
+  };
+
+  const getStatusIcon = (status: CheckInStatus) => {
+    switch (status) {
+      case "worked": return <CheckIcon className="h-3.5 w-3.5" />;
+      case "missed": return <XIcon className="h-3.5 w-3.5" />;
+      case "day-off": return <CalendarIcon className="h-3.5 w-3.5" />;
+      case "suspended-client": return <ClockIcon className="h-3.5 w-3.5" />;
+      default: return <InfoIcon className="h-3.5 w-3.5" />;
     }
   };
 
@@ -78,6 +101,21 @@ const Calendar: React.FC<CalendarProps> = ({ month, entries, onSelectDay }) => {
     
     return isWeekday(date) && totalHours > 0 && totalHours < 8;
   };
+  
+  // Check if day should be marked as missed
+  const shouldMarkAsMissed = (day: number | null): boolean => {
+    if (day === null) return false;
+    
+    const date = new Date(month.getFullYear(), month.getMonth(), day);
+    
+    // Only consider past weekdays
+    if (!isPastDate(date) || !isWeekday(date)) return false;
+    
+    const dayEntries = getEntriesForDay(day);
+    
+    // If no entries or all entries are missed, day should be marked as missed
+    return dayEntries.length === 0 || dayEntries.every(entry => entry.status === "missed");
+  };
 
   return (
     <div className="grid grid-cols-7 gap-1">
@@ -92,6 +130,7 @@ const Calendar: React.FC<CalendarProps> = ({ month, entries, onSelectDay }) => {
         const date = day ? new Date(month.getFullYear(), month.getMonth(), day) : null;
         const lessHours = isLessThanExpected(dayEntries, date);
         const isFuture = date ? isFutureDate(date) : false;
+        const isMissed = shouldMarkAsMissed(day);
         
         const totalHours = dayEntries.reduce((total, entry) => {
           return entry.status === "worked" ? total + entry.hours : total;
@@ -107,23 +146,65 @@ const Calendar: React.FC<CalendarProps> = ({ month, entries, onSelectDay }) => {
           >
             <CardContent className="p-0 flex flex-col h-full justify-between">
               <div className="flex justify-between items-start">
-                <span className="font-medium">{day}</span>
-                {dayEntries.length > 0 && statuses.length === 1 && (
-                  <Badge className={getStatusColor(statuses[0])}>
-                    {statuses[0]}
-                  </Badge>
-                )}
-                {dayEntries.length > 0 && statuses.length > 1 && (
-                  <Badge className="bg-proxify-blue text-white">multiple</Badge>
+                <span className="font-medium text-black">{day}</span>
+                {(dayEntries.length > 0 || isMissed) && (
+                  <HoverCard>
+                    <HoverCardTrigger asChild>
+                      <div className="cursor-help">
+                        {isMissed && dayEntries.length === 0 ? (
+                          <Badge className="bg-red-500 text-white">
+                            <XIcon className="h-3.5 w-3.5" />
+                          </Badge>
+                        ) : dayEntries.length > 0 && statuses.length === 1 ? (
+                          <Badge className={getStatusColor(statuses[0])}>
+                            {getStatusIcon(statuses[0])}
+                          </Badge>
+                        ) : (
+                          <Badge className="bg-proxify-blue text-white">
+                            <BriefcaseIcon className="h-3.5 w-3.5" />
+                          </Badge>
+                        )}
+                      </div>
+                    </HoverCardTrigger>
+                    <HoverCardContent className="w-80 p-4">
+                      <div className="space-y-2">
+                        <h4 className="text-sm font-semibold">Day Status</h4>
+                        {dayEntries.length === 0 && isMissed ? (
+                          <p className="text-sm">Missed workday</p>
+                        ) : (
+                          <>
+                            {dayEntries.map((entry, i) => (
+                              <div key={i} className="border-b border-gray-100 pb-2 last:border-0 last:pb-0">
+                                <div className="flex justify-between items-center">
+                                  <span className="font-medium text-sm">{entry.projectName}</span>
+                                  <Badge className={getStatusColor(entry.status)} variant="outline">
+                                    {entry.status}
+                                  </Badge>
+                                </div>
+                                {entry.status === "worked" && (
+                                  <div className="text-sm">Hours: {entry.hours}</div>
+                                )}
+                                {entry.notes && (
+                                  <div className="text-xs mt-1 text-gray-500">
+                                    Goals: {entry.notes}
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </>
+                        )}
+                      </div>
+                    </HoverCardContent>
+                  </HoverCard>
                 )}
               </div>
               
               {dayEntries.length > 0 && dayEntries.some(e => e.status === "worked") && (
                 <div className="mt-2 text-center relative">
-                  <span className="text-lg font-bold text-proxify-blue">{totalHours}h</span>
+                  <span className="text-lg font-bold text-black">{totalHours}h</span>
                   
                   {dayEntries.length > 1 && (
-                    <div className="flex items-center justify-center mt-1 text-proxify-blue">
+                    <div className="flex items-center justify-center mt-1 text-black">
                       <BriefcaseIcon className="h-4 w-4 mr-1" />
                       <span className="text-xs">{dayEntries.length} projects</span>
                     </div>
