@@ -18,7 +18,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { toast } from "@/components/ui/sonner";
-import { ArrowLeft, ArrowRight, Confetti } from "lucide-react";
+import { ArrowLeft, ArrowRight, PartyPopper } from "lucide-react";
 import { 
   Select,
   SelectContent,
@@ -418,7 +418,7 @@ const TimeTracker = () => {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center">
-              <Confetti className="mr-2 h-5 w-5 text-green-500" />
+              <PartyPopper className="mr-2 h-5 w-5 text-green-500" />
               Success!
             </AlertDialogTitle>
             <AlertDialogDescription>
