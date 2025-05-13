@@ -89,6 +89,14 @@
   * {
     @apply border-border;
   }
+  
+  /* Remove borders from calendar labels */
+  .calendar label,
+  .calendar .label,
+  .calendar span,
+  .calendar div {
+    @apply border-0;
+  }
 
   body {
     @apply bg-background text-foreground;

@@ -95,25 +95,25 @@ export const DayStatusBadge: React.FC<DayStatusBadgeProps> = ({
   return (
     <HoverCard openDelay={100} closeDelay={100}>
       <HoverCardTrigger asChild>
-        <div className="cursor-help">
-          <Badge className={`${color} opacity-90`}>
+        <div className="cursor-help border-0">
+          <Badge className={`${color} opacity-90 border-0`}>
             {icon}
           </Badge>
         </div>
       </HoverCardTrigger>
       <HoverCardContent className="w-80 p-4">
-        <div className="space-y-2">
-          <h4 className="text-sm font-semibold">Day Status</h4>
+        <div className="space-y-2 border-0">
+          <h4 className="text-sm font-semibold border-0">Day Status</h4>
           {dayEntries.length === 0 && isMissed ? (
-            <p className="text-sm">
-              <span className="font-medium">Missed workday</span>
+            <p className="text-sm border-0">
+              <span className="font-medium border-0">Missed workday</span>
             </p>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-3 border-0">
               {dayEntries.map((entry, i) => (
                 <div key={i} className="border-b border-gray-100 pb-2 last:border-0 last:pb-0 flex flex-col">
-                  <div className="flex justify-between items-start">
-                    <span className="font-medium text-sm">{entry.projectName}</span>
+                  <div className="flex justify-between items-start border-0">
+                    <span className="font-medium text-sm border-0">{entry.projectName}</span>
                     <Badge className={getStatusColor(entry.status)} variant="outline">
                       {entry.status === "worked" ? "Worked" : 
                        entry.status === "day-off" ? "Time-off" : 
@@ -122,12 +122,12 @@ export const DayStatusBadge: React.FC<DayStatusBadgeProps> = ({
                     </Badge>
                   </div>
                   {entry.status === "worked" ? (
-                    <div className="text-sm">Hours: {entry.hours}</div>
+                    <div className="text-sm border-0">Hours: {entry.hours}</div>
                   ) : (
-                    <div className="text-sm">Hours: 0</div>
+                    <div className="text-sm border-0">Hours: 0</div>
                   )}
                   {entry.notes && (
-                    <div className="text-xs mt-1 text-gray-500">
+                    <div className="text-xs mt-1 text-gray-500 border-0">
                       Goals: {entry.notes}
                     </div>
                   )}

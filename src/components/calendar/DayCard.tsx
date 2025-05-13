@@ -1,4 +1,3 @@
-
 import React from "react";
 import { DayEntry, CheckInStatus, ReportStatus } from "@/types/time-tracker";
 import { Badge } from "@/components/ui/badge";
@@ -116,9 +115,9 @@ export const DayCard: React.FC<DayCardProps> = ({ day, month, entries, onSelectD
 
   return (
     <Card className={cardClasses}>
-      <CardContent className="p-0 flex flex-col h-full justify-between">
-        <div className="flex justify-between items-start">
-          <span className="font-medium text-black">{day}</span>
+      <CardContent className="p-0 flex flex-col h-full justify-between border-0">
+        <div className="flex justify-between items-start border-0">
+          <span className="font-medium text-black border-0">{day}</span>
           {(dayEntries.length > 0 || isMissed) && (
             <DayStatusBadge 
               isMissed={isMissed} 
@@ -129,31 +128,31 @@ export const DayCard: React.FC<DayCardProps> = ({ day, month, entries, onSelectD
         </div>
         
         {shouldShowHours && (
-          <div className="mt-1 text-center">
-            <div className="flex items-center justify-center">
+          <div className="mt-1 text-center border-0">
+            <div className="flex items-center justify-center border-0">
               {/* Add the warning icon before the hours if less than 8 hours */}
               {isLessThan8Hours && (
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <div className="mr-1 cursor-help">
+                      <div className="mr-1 cursor-help border-0">
                         <AlertTriangleIcon className="h-4 w-4 text-amber-500" />
                       </div>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p className="text-xs">Reporting less than 8 hours for this day</p>
+                      <p className="text-xs border-0">Reporting less than 8 hours for this day</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
               )}
-              <span className="text-lg font-bold text-black">{totalHours}h</span>
+              <span className="text-lg font-bold text-black border-0">{totalHours}h</span>
             </div>
             
             {/* Underreported hours indicator in orange */}
             {lessHours && (
-              <div className="flex items-center justify-center mt-1">
+              <div className="flex items-center justify-center mt-1 border-0">
                 <AlertTriangleIcon className="h-3 w-3 mr-1 text-orange-500 opacity-70" />
-                <span className="text-xs text-orange-500">Underreported</span>
+                <span className="text-xs text-orange-500 border-0">Underreported</span>
               </div>
             )}
           </div>
@@ -162,11 +161,11 @@ export const DayCard: React.FC<DayCardProps> = ({ day, month, entries, onSelectD
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <div>
+              <div className="border-0">
                 <Button 
                   variant="ghost" 
                   size="sm" 
-                  className="mt-auto w-full h-6 justify-center text-proxify-blue bg-proxify-lavender/10 hover:bg-proxify-blue hover:text-white"
+                  className="mt-auto w-full h-6 justify-center text-proxify-blue bg-proxify-lavender/10 hover:bg-proxify-blue hover:text-white border-0"
                   onClick={() => onSelectDay(date)}
                   disabled={isFuture || isLocked}
                   style={{ height: "24px" }}
