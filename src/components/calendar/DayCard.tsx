@@ -1,3 +1,4 @@
+
 import React from "react";
 import { DayEntry, CheckInStatus } from "@/types/time-tracker";
 import { Badge } from "@/components/ui/badge";
@@ -107,15 +108,12 @@ export const DayCard: React.FC<DayCardProps> = ({ day, month, entries, onSelectD
           )}
         </div>
         
-        {dayEntries.length > 0 && dayEntries.some(e => e.status === "worked") && (
+        {dayEntries.length > 0 && (
           <div className="mt-1 text-center">
-            <span className="text-lg font-bold text-black">{totalHours}h</span>
-            
-            {dayEntries.length > 1 && (
-              <div className="flex items-center justify-center mt-1">
-                <BriefcaseIcon className="h-3 w-3 mr-1 text-gray-500 opacity-50" />
-                <span className="text-xs text-black">{dayEntries.length} projects</span>
-              </div>
+            {dayEntries.some(e => e.status === "worked") ? (
+              <span className="text-lg font-bold text-black">{totalHours}h</span>
+            ) : (
+              <span className="text-lg font-bold text-black">0h</span>
             )}
             
             {/* Underreported hours indicator in orange */}

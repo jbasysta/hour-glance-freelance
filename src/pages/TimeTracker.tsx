@@ -17,7 +17,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { toast } from "@/components/ui/sonner";
+import { ArrowLeft, ArrowRight, Confetti } from "lucide-react";
 import { 
   Select,
   SelectContent,
@@ -25,6 +26,17 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import JSConfetti from 'js-confetti';
 
 // Sample projects
 const SAMPLE_PROJECTS: Project[] = [
@@ -42,7 +54,9 @@ const TimeTracker = () => {
   const [projects] = useState<Project[]>(SAMPLE_PROJECTS);
   const [timeReports, setTimeReports] = useState<TimeReport[]>([]);
   const [selectedProject, setSelectedProject] = useState<string>("all");
-  const { toast } = useToast();
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [successDialogOpen, setSuccessDialogOpen] = useState(false);
+  const { toast: useToastfn } = useToast();
 
   // Load entries from localStorage on component mount
   useEffect(() => {
@@ -160,11 +174,16 @@ const TimeTracker = () => {
       }
     });
 
-    toast({
+    useToastfn({
       title: "Time Entry Saved",
       description: `Your time entry for ${format(entry.date, 'MMMM d, yyyy')} has been saved.`,
       className: "bg-[#F2FCE2] text-[#1A1F2C] border-green-200"
     });
+  };
+
+  const handleConfirmSubmit = () => {
+    setConfirmDialogOpen(false);
+    submitTimeReport();
   };
 
   const submitTimeReport = () => {
@@ -193,10 +212,18 @@ const TimeTracker = () => {
       }
     });
     
-    toast({
-      title: "Time Report Submitted",
-      description: `Your time report for ${formatMonthYear(currentMonth)} has been submitted and is pending approval.`,
-      className: "bg-[#F2FCE2] text-[#1A1F2C] border-green-200"
+    setSuccessDialogOpen(true);
+
+    // Create confetti effect
+    const jsConfetti = new JSConfetti();
+    jsConfetti.addConfetti({
+      confettiColors: [
+        '#7C3AED', // proxify purple
+        '#F2FCE2', // light green
+        '#22c55e', // success green
+        '#60a5fa', // proxify blue
+      ],
+      confettiNumber: 300,
     });
   };
 
@@ -310,7 +337,7 @@ const TimeTracker = () => {
             <CardContent>
               <dl className="space-y-2">
                 <div className="flex justify-between">
-                  <dt>Expected Hours:</dt>
+                  <dt>Contracted Hours:</dt>
                   <dd className="font-medium">{expectedHours}</dd>
                 </div>
                 <div className="flex justify-between">
@@ -331,17 +358,17 @@ const TimeTracker = () => {
               
               <Button 
                 className="w-full" 
-                onClick={submitTimeReport}
-                disabled={reportedHours < expectedHours || reportStatus !== "upcoming"}
+                onClick={() => {
+                  if (reportedHours < expectedHours) {
+                    setConfirmDialogOpen(true);
+                  } else {
+                    submitTimeReport();
+                  }
+                }}
+                disabled={reportStatus !== "upcoming"}
               >
                 Submit Time Report
               </Button>
-              
-              {reportedHours < expectedHours && reportStatus === "upcoming" && (
-                <p className="text-xs text-muted-foreground mt-2">
-                  You need to report {remainingHours.toFixed(1)} more hours before submitting.
-                </p>
-              )}
               
               {reportStatus !== "upcoming" && (
                 <p className="text-xs text-muted-foreground mt-2">
@@ -366,6 +393,45 @@ const TimeTracker = () => {
         existingEntry={existingEntry}
         projects={projects}
       />
+
+      {/* Confirmation dialog for submitting with less hours */}
+      <AlertDialog open={confirmDialogOpen} onOpenChange={setConfirmDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Submit with incomplete hours?</AlertDialogTitle>
+            <AlertDialogDescription>
+              You have reported only {reportedHours.toFixed(1)} of {expectedHours} contracted hours. 
+              Submitting now means you may lose earnings for the {remainingHours.toFixed(1)} remaining hours.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmSubmit}>
+              Submit Anyway
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Success dialog */}
+      <AlertDialog open={successDialogOpen} onOpenChange={setSuccessDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center">
+              <Confetti className="mr-2 h-5 w-5 text-green-500" />
+              Success!
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Your time report for {formatMonthYear(currentMonth)} has been submitted and is pending approval.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction>
+              Close
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
