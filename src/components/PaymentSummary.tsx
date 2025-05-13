@@ -17,6 +17,11 @@ const PaymentSummary: React.FC<PaymentSummaryProps> = ({ summary, month }) => {
     }).format(value);
   };
 
+  // Calculate the hourly rate based on monthly compensation divided by contracted hours
+  const calculatedHourlyRate = summary.expectedHours > 0 ? 
+    summary.monthlySalary / summary.expectedHours : 
+    summary.hourlyRate;
+
   return (
     <Card>
       <CardHeader>
@@ -41,7 +46,7 @@ const PaymentSummary: React.FC<PaymentSummaryProps> = ({ summary, month }) => {
             </TableRow>
             <TableRow>
               <TableCell className="font-medium text-left">
-                Working time deviation ({summary.deviationHours} hours @ {formatCurrency(summary.hourlyRate)} /hour)
+                Working time deviation ({summary.deviationHours} hours @ {formatCurrency(calculatedHourlyRate)} /hour)
               </TableCell>
               <TableCell className="text-right">{formatCurrency(summary.deviationCost)}</TableCell>
             </TableRow>

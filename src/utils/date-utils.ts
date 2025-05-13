@@ -1,3 +1,4 @@
+
 import { DayEntry, TimeReport } from "@/types/time-tracker";
 import { MonthSummary } from "@/types/time-tracker";
 
@@ -157,9 +158,14 @@ export const calculateMonthSummary = (
   
   const remainingHours = Math.max(0, effectiveExpectedHours - reportedHours);
   
+  // Calculate the hourly rate based on monthly compensation divided by expected hours
+  const calculatedHourlyRate = effectiveExpectedHours > 0 ? 
+    monthlySalary / effectiveExpectedHours : 
+    hourlyRate;
+  
   // Calculate deviationHours and deviationCost
   const deviationHours = reportedHours - effectiveExpectedHours;
-  const deviationCost = -(deviationHours < 0 ? Math.abs(deviationHours) * hourlyRate : 0);
+  const deviationCost = -(deviationHours < 0 ? Math.abs(deviationHours) * calculatedHourlyRate : 0);
   
   // Formula for earned flex days
   const earnedFlexDays = Math.max(0, 2 * (reportedHours / effectiveExpectedHours));
@@ -175,7 +181,7 @@ export const calculateMonthSummary = (
     monthlySalary,
     missedDays: 0, // Keep this property but set to 0 since we're not using it
     missedDaysCost: 0, // Keep this property but set to 0 since we're not using it
-    hourlyRate,
+    hourlyRate: calculatedHourlyRate, // Store the calculated hourly rate
     deviationHours,
     deviationCost,
     earnedFlexDays: parseFloat(earnedFlexDays.toFixed(1)),
