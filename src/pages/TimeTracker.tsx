@@ -403,7 +403,8 @@ const TimeTracker = () => {
               <Calendar 
                 month={currentMonth} 
                 entries={currentMonthEntries} 
-                onSelectDay={handleDaySelect} 
+                onSelectDay={handleDaySelect}
+                reportStatus={reportStatus}
               />
             </CardContent>
           </Card>
@@ -472,6 +473,7 @@ const TimeTracker = () => {
         onSave={handleSaveEntry}
         existingEntry={existingEntry}
         projects={projects}
+        reportStatus={reportStatus}
       />
 
       {/* Confirmation dialog for submitting with less hours */}

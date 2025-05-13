@@ -1,6 +1,6 @@
 
 import React from "react";
-import { DayEntry, CheckInStatus } from "@/types/time-tracker";
+import { DayEntry, CheckInStatus, ReportStatus } from "@/types/time-tracker";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,20 +12,23 @@ import {
   CheckIcon,
   XIcon,
   ClockIcon,
-  CalendarIcon
+  CalendarIcon,
+  LockIcon
 } from "lucide-react";
 import { DayStatusBadge } from "./DayStatusBadge";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface DayCardProps {
   day: number | null;
   month: Date;
   entries: DayEntry[];
   onSelectDay: (date: Date) => void;
+  reportStatus: ReportStatus;
 }
 
-export const DayCard: React.FC<DayCardProps> = ({ day, month, entries, onSelectDay }) => {
+export const DayCard: React.FC<DayCardProps> = ({ day, month, entries, onSelectDay, reportStatus }) => {
   const isMobile = useIsMobile();
   
   if (day === null) {
@@ -43,6 +46,7 @@ export const DayCard: React.FC<DayCardProps> = ({ day, month, entries, onSelectD
   const dayEntries = getDayEntries();
   const lessHours = isLessThanExpected();
   const isMissed = shouldMarkAsMissed();
+  const isLocked = reportStatus !== "declined" && reportStatus !== "upcoming";
   
   const totalHours = dayEntries.reduce((total, entry) => {
     return entry.status === "worked" ? total + entry.hours : total;
@@ -101,11 +105,19 @@ export const DayCard: React.FC<DayCardProps> = ({ day, month, entries, onSelectD
     cardClasses += " bg-white";
   }
 
+  // Add a locked class for non-editable days
+  if (isLocked && !isFuture) {
+    cardClasses += " bg-gray-50";
+  }
+
   return (
     <Card className={cardClasses}>
       <CardContent className="p-0 flex flex-col h-full justify-between">
         <div className="flex justify-between items-start">
           <span className="font-medium text-black">{day}</span>
+          {isLocked && !isFuture ? (
+            <LockIcon className="h-3 w-3 text-gray-400" />
+          ) : null}
           {(dayEntries.length > 0 || isMissed) && (
             <DayStatusBadge 
               isMissed={isMissed} 
@@ -133,16 +145,29 @@ export const DayCard: React.FC<DayCardProps> = ({ day, month, entries, onSelectD
           </div>
         )}
         
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          className="mt-auto w-full h-6 justify-center text-proxify-blue bg-proxify-lavender/10 hover:bg-proxify-blue hover:text-white"
-          onClick={() => onSelectDay(date)}
-          disabled={isFuture}
-          style={{ height: "24px" }}
-        >
-          {dayEntries.length > 0 ? "Edit" : "Add"}
-        </Button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="mt-auto w-full h-6 justify-center text-proxify-blue bg-proxify-lavender/10 hover:bg-proxify-blue hover:text-white"
+                  onClick={() => onSelectDay(date)}
+                  disabled={isFuture || isLocked}
+                  style={{ height: "24px" }}
+                >
+                  {dayEntries.length > 0 ? "Edit" : "Add"}
+                </Button>
+              </div>
+            </TooltipTrigger>
+            {(isFuture || isLocked) && (
+              <TooltipContent>
+                {isFuture ? "Cannot edit future dates" : `Time report is ${reportStatus}`}
+              </TooltipContent>
+            )}
+          </Tooltip>
+        </TooltipProvider>
       </CardContent>
     </Card>
   );
