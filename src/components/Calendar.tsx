@@ -1,10 +1,10 @@
-
 import React from "react";
 import { DayEntry, CheckInStatus } from "@/types/time-tracker";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatDayOfMonth, isWeekday } from "@/utils/date-utils";
+import { ClockIcon, AlertTriangleIcon } from "lucide-react";
 
 interface CalendarProps {
   month: Date;
@@ -64,6 +64,12 @@ const Calendar: React.FC<CalendarProps> = ({ month, entries, onSelectDay }) => {
     return classes;
   };
 
+  // New function to check if hours are less than expected
+  const isLessThanExpected = (entry: DayEntry | undefined, date: Date | null): boolean => {
+    if (!entry || !date || entry.status !== "worked") return false;
+    return isWeekday(date) && entry.hours < 8;
+  };
+
   return (
     <div className="grid grid-cols-7 gap-1">
       {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
@@ -75,6 +81,7 @@ const Calendar: React.FC<CalendarProps> = ({ month, entries, onSelectDay }) => {
       {calendar.map((day, index) => {
         const entry = getEntryForDay(day);
         const date = day ? new Date(month.getFullYear(), month.getMonth(), day) : null;
+        const lessHours = isLessThanExpected(entry, date);
         
         return (
           <Card 
@@ -92,8 +99,16 @@ const Calendar: React.FC<CalendarProps> = ({ month, entries, onSelectDay }) => {
               </div>
               
               {entry && entry.status === "worked" && (
-                <div className="mt-2 text-center">
+                <div className="mt-2 text-center relative">
                   <span className="text-lg font-bold">{entry.hours}h</span>
+                  
+                  {/* Add indicator for less than expected hours */}
+                  {lessHours && (
+                    <div className="flex items-center justify-center mt-1 text-amber-600">
+                      <AlertTriangleIcon className="h-4 w-4 mr-1" />
+                      <span className="text-xs">Underreported</span>
+                    </div>
+                  )}
                 </div>
               )}
               
