@@ -17,7 +17,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { toast } from "@/components/ui/sonner";
-import { ArrowLeft, ArrowRight, PartyPopper } from "lucide-react";
+import { ArrowLeft, ArrowRight, PartyPopper, RefreshCcw } from "lucide-react";
 import { 
   Select,
   SelectContent,
@@ -55,6 +55,7 @@ const TimeTracker = () => {
   const [selectedProject, setSelectedProject] = useState<string>("all");
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [successDialogOpen, setSuccessDialogOpen] = useState(false);
+  const [cleanConfirmDialogOpen, setCleanConfirmDialogOpen] = useState(false);
   const { toast: useToastfn } = useToast();
 
   // Load entries from localStorage on component mount
@@ -226,6 +227,67 @@ const TimeTracker = () => {
     });
   };
 
+  // Reset data to initial state
+  const cleanData = () => {
+    const currentYear = new Date().getFullYear();
+    const currentMonth = new Date().getMonth();
+    
+    // Create initial time reports based on specifications
+    const initialReports: TimeReport[] = [];
+    
+    // 1. January and before - approved
+    for (let month = 0; month <= 0; month++) {
+      initialReports.push({
+        month,
+        year: currentYear,
+        reportStatus: "approved",
+        submittedAt: new Date(currentYear, month, 28)
+      });
+    }
+    
+    // 2. February - declined
+    initialReports.push({
+      month: 1,
+      year: currentYear,
+      reportStatus: "declined",
+      submittedAt: new Date(currentYear, 1, 28)
+    });
+    
+    // 3. March - approved
+    initialReports.push({
+      month: 2,
+      year: currentYear,
+      reportStatus: "approved",
+      submittedAt: new Date(currentYear, 2, 28)
+    });
+    
+    // 4. April - pending approval
+    initialReports.push({
+      month: 3,
+      year: currentYear,
+      reportStatus: "pending-approval",
+      submittedAt: new Date(currentYear, 3, 28)
+    });
+    
+    // Clear all entries
+    setEntries([]);
+    
+    // Set the time reports
+    setTimeReports(initialReports);
+    
+    // Save to localStorage
+    localStorage.setItem('timeEntries', JSON.stringify([]));
+    localStorage.setItem('timeReports', JSON.stringify(initialReports));
+    
+    // Show success toast
+    toast.success("Time tracking data has been reset to default state", {
+      position: "top-center",
+      duration: 3000
+    });
+    
+    setCleanConfirmDialogOpen(false);
+  };
+
   // Filter entries for the current month and selected project
   const currentMonthEntries = entries.filter(entry => {
     const isCurrentMonth = entry.date.getMonth() === currentMonth.getMonth() && 
@@ -283,7 +345,18 @@ const TimeTracker = () => {
 
   return (
     <div className="container mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-6">Time Tracker</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Time Tracker</h1>
+        <Button 
+          variant="subtle" 
+          size="sm" 
+          className="flex items-center" 
+          onClick={() => setCleanConfirmDialogOpen(true)}
+        >
+          <RefreshCcw className="h-4 w-4 mr-1" />
+          Clean
+        </Button>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-2">
@@ -435,6 +508,25 @@ const TimeTracker = () => {
           <AlertDialogFooter>
             <AlertDialogAction>
               Close
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Clean data confirmation dialog */}
+      <AlertDialog open={cleanConfirmDialogOpen} onOpenChange={setCleanConfirmDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Reset Data</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will reset all time tracking data to the initial state. All your current entries will be deleted.
+              Are you sure you want to continue?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={cleanData}>
+              Reset Data
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
