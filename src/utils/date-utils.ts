@@ -144,16 +144,16 @@ export const calculateMonthSummary = (
   const uniqueProjects = [...new Set(entries.map(entry => entry.projectId))];
   const projectCount = uniqueProjects.length || 1;
   
-  // Calculate expected hours based on 2h per day per project
+  // Calculate contracted hours based on 2h per day per project
   const weekdaysInMonth = getWeekdaysInMonth(year, month);
-  const expectedHours = weekdaysInMonth.length * 2 * projectCount;
+  const contractedHoursValue = weekdaysInMonth.length * 2 * projectCount;
   
   // Calculate reported hours, only count "worked" status
   const reportedHours = entries.reduce((total, entry) => {
     return entry.status === "worked" ? total + entry.hours : total;
   }, 0);
   
-  const remainingHours = Math.max(0, expectedHours - reportedHours);
+  const remainingHours = Math.max(0, contractedHoursValue - reportedHours);
   
   // Count missed days
   const missedDays = weekdaysInMonth.filter(date => {
@@ -171,21 +171,21 @@ export const calculateMonthSummary = (
   const dailyRate = monthlySalary / weekdaysInMonth.length;
   const missedDaysCost = -(missedDays * dailyRate);
   
-  const deviationHours = reportedHours - expectedHours;
+  const deviationHours = reportedHours - contractedHoursValue;
   const deviationCost = -(deviationHours < 0 ? Math.abs(deviationHours) * hourlyRate : 0);
   
-  // New formula for earned flex days
-  const earnedFlexDays = Math.max(0, 2 * (reportedHours / expectedHours));
+  // Formula for earned flex days
+  const earnedFlexDays = Math.max(0, 2 * (reportedHours / contractedHoursValue));
   
   const subtotal = missedDaysCost + deviationCost > 0 ? 
     monthlySalary + missedDaysCost + deviationCost : 
     monthlySalary + missedDaysCost + deviationCost;
 
   return {
-    expectedHours,
+    expectedHours: contractedHoursValue,
     reportedHours,
     remainingHours,
-    contractedHours: expectedHours, // Use the calculated expected hours as contracted hours
+    contractedHours: contractedHoursValue, // Use the calculated contracted hours
     monthlySalary,
     missedDays,
     missedDaysCost,
