@@ -137,11 +137,11 @@ const TimeEntryForm: React.FC<TimeEntryFormProps> = ({
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="day-off" id="day-off" />
-                <Label htmlFor="day-off">Day Off</Label>
+                <Label htmlFor="day-off">Time-off</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="suspended-client" id="suspended-client" />
-                <Label htmlFor="suspended-client">Suspended Client</Label>
+                <Label htmlFor="suspended-client">Suspended</Label>
               </div>
             </RadioGroup>
           </div>

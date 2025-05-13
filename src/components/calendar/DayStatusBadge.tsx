@@ -6,9 +6,9 @@ import {
   BriefcaseIcon, 
   CheckIcon,
   XIcon,
-  SunIcon,
+  CalendarMinusIcon,
   ClockIcon,
-  CalendarOffIcon
+  ClockOffIcon
 } from "lucide-react";
 import {
   HoverCard,
@@ -35,7 +35,7 @@ export const DayStatusBadge: React.FC<DayStatusBadgeProps> = ({
     }
   };
 
-  // Updated function with the priority order logic
+  // Updated function with the priority order logic and new labels
   const getDayStatusDetails = () => {
     // If no entries and isMissed flag is true, show Missed icon
     if (dayEntries.length === 0 && isMissed) {
@@ -68,8 +68,8 @@ export const DayStatusBadge: React.FC<DayStatusBadgeProps> = ({
     if (dayEntries.length > 0 && dayEntries.every(entry => entry.status === "day-off")) {
       return {
         color: "bg-gray-300 text-gray-800",
-        icon: <SunIcon className="h-3.5 w-3.5 text-gray-600 opacity-50" />,
-        label: "Day Off"
+        icon: <CalendarMinusIcon className="h-3.5 w-3.5 text-gray-600 opacity-50" />,
+        label: "Time-off"
       };
     }
     
@@ -77,7 +77,7 @@ export const DayStatusBadge: React.FC<DayStatusBadgeProps> = ({
     if (dayEntries.length > 0 && dayEntries.every(entry => entry.status === "suspended-client")) {
       return {
         color: "bg-proxify-yellow text-black",
-        icon: <CalendarOffIcon className="h-3.5 w-3.5 text-black opacity-50" />,
+        icon: <ClockOffIcon className="h-3.5 w-3.5 text-black opacity-50" />,
         label: "Suspended"
       };
     }
@@ -115,7 +115,10 @@ export const DayStatusBadge: React.FC<DayStatusBadgeProps> = ({
                   <div className="flex justify-between items-start">
                     <span className="font-medium text-sm">{entry.projectName}</span>
                     <Badge className={getStatusColor(entry.status)} variant="outline">
-                      {entry.status}
+                      {entry.status === "worked" ? "Worked" : 
+                       entry.status === "day-off" ? "Time-off" : 
+                       entry.status === "suspended-client" ? "Suspended" : 
+                       entry.status}
                     </Badge>
                   </div>
                   {entry.status === "worked" ? (
