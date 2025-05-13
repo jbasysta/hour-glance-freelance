@@ -48,6 +48,7 @@ export const DayCard: React.FC<DayCardProps> = ({ day, month, entries, onSelectD
   const isMissed = shouldMarkAsMissed();
   const isLocked = reportStatus !== "declined" && reportStatus !== "upcoming";
   
+  // Updated to handle cases where entries have non-worked statuses (should show 0 hours)
   const totalHours = dayEntries.reduce((total, entry) => {
     return entry.status === "worked" ? total + entry.hours : total;
   }, 0);
@@ -110,6 +111,9 @@ export const DayCard: React.FC<DayCardProps> = ({ day, month, entries, onSelectD
     cardClasses += " bg-gray-50";
   }
 
+  // Determine if we should show hours (only on past or current weekdays)
+  const shouldShowHours = isWeekday(date) && !isFuture;
+
   return (
     <Card className={cardClasses}>
       <CardContent className="p-0 flex flex-col h-full justify-between">
@@ -127,13 +131,9 @@ export const DayCard: React.FC<DayCardProps> = ({ day, month, entries, onSelectD
           )}
         </div>
         
-        {dayEntries.length > 0 && (
+        {shouldShowHours && (
           <div className="mt-1 text-center">
-            {dayEntries.some(e => e.status === "worked") ? (
-              <span className="text-lg font-bold text-black">{totalHours}h</span>
-            ) : (
-              <span className="text-lg font-bold text-black">0h</span>
-            )}
+            <span className="text-lg font-bold text-black">{totalHours}h</span>
             
             {/* Underreported hours indicator in orange */}
             {lessHours && (

@@ -6,9 +6,9 @@ import {
   BriefcaseIcon, 
   CheckIcon,
   XIcon,
+  SunIcon,
   ClockIcon,
-  CalendarIcon,
-  SunIcon
+  CalendarOffIcon
 } from "lucide-react";
 import {
   HoverCard,
@@ -35,44 +35,58 @@ export const DayStatusBadge: React.FC<DayStatusBadgeProps> = ({
     }
   };
 
-  // New function to determine which icon to show based on the updated logic
+  // Updated function with the priority order logic
   const getDayStatusDetails = () => {
     // If no entries and isMissed flag is true, show Missed icon
     if (dayEntries.length === 0 && isMissed) {
       return {
         color: "bg-red-500 text-white",
-        icon: <XIcon className="h-3.5 w-3.5 opacity-50" />
+        icon: <XIcon className="h-3.5 w-3.5 opacity-50" />,
+        label: "Missed"
       };
     }
     
-    // If any entry has "day-off" status, show Day Off icon
-    if (dayEntries.some(entry => entry.status === "day-off")) {
-      return {
-        color: "bg-gray-300 text-gray-800",
-        icon: <SunIcon className="h-3.5 w-3.5 text-gray-600 opacity-50" />
-      };
-    }
-    
-    // If all entries are missed, show Missed icon
-    if (dayEntries.length > 0 && dayEntries.every(entry => entry.status === "missed")) {
-      return {
-        color: "bg-red-500 text-white", 
-        icon: <XIcon className="h-3.5 w-3.5 text-white opacity-50" />
-      };
-    }
-    
-    // For days with worked hours (not all missed)
+    // Priority 1: If at least one project is "worked" - label is worked
     if (dayEntries.some(entry => entry.status === "worked")) {
       return {
         color: "bg-proxify-green text-white",
-        icon: <CheckIcon className="h-3.5 w-3.5 text-white opacity-50" />
+        icon: <CheckIcon className="h-3.5 w-3.5 text-white opacity-50" />,
+        label: "Worked"
       };
     }
     
-    // Default case (including suspended-client)
+    // Priority 2: If all projects are missed - label is missed
+    if (dayEntries.length > 0 && dayEntries.every(entry => entry.status === "missed")) {
+      return {
+        color: "bg-red-500 text-white", 
+        icon: <XIcon className="h-3.5 w-3.5 text-white opacity-50" />,
+        label: "Missed"
+      };
+    }
+    
+    // Priority 3: If all projects are day-off - day off label
+    if (dayEntries.length > 0 && dayEntries.every(entry => entry.status === "day-off")) {
+      return {
+        color: "bg-gray-300 text-gray-800",
+        icon: <SunIcon className="h-3.5 w-3.5 text-gray-600 opacity-50" />,
+        label: "Day Off"
+      };
+    }
+    
+    // Priority 4: If all projects are suspended - suspended label
+    if (dayEntries.length > 0 && dayEntries.every(entry => entry.status === "suspended-client")) {
+      return {
+        color: "bg-proxify-yellow text-black",
+        icon: <CalendarOffIcon className="h-3.5 w-3.5 text-black opacity-50" />,
+        label: "Suspended"
+      };
+    }
+    
+    // Default case (mixed status or other)
     return {
       color: "bg-proxify-blue text-white",
-      icon: <BriefcaseIcon className="h-3.5 w-3.5 opacity-50" />
+      icon: <BriefcaseIcon className="h-3.5 w-3.5 opacity-50" />,
+      label: "Mixed"
     };
   };
 
@@ -104,8 +118,10 @@ export const DayStatusBadge: React.FC<DayStatusBadgeProps> = ({
                       {entry.status}
                     </Badge>
                   </div>
-                  {entry.status === "worked" && (
+                  {entry.status === "worked" ? (
                     <div className="text-sm">Hours: {entry.hours}</div>
+                  ) : (
+                    <div className="text-sm">Hours: 0</div>
                   )}
                   {entry.notes && (
                     <div className="text-xs mt-1 text-gray-500">
