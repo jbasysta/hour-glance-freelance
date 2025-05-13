@@ -13,8 +13,8 @@ interface CalendarProps {
 }
 
 const Calendar: React.FC<CalendarProps> = ({ month, entries, onSelectDay, reportStatus }) => {
-  // Calendar header with day names
-  const weekdayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  // Calendar header with day names - updated to start from Monday
+  const weekdayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
   return (
     <div className="calendar">
