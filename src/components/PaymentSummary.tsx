@@ -34,7 +34,7 @@ const PaymentSummary: React.FC<PaymentSummaryProps> = ({ summary, month }) => {
           <TableBody>
             <TableRow>
               <TableCell className="font-medium text-left">Contracted hours</TableCell>
-              <TableCell className="text-right">{summary.expectedHours}</TableCell>
+              <TableCell className="text-right">{summary.expectedHours.toFixed(1)}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell className="font-medium text-left">Total hours</TableCell>
@@ -46,7 +46,7 @@ const PaymentSummary: React.FC<PaymentSummaryProps> = ({ summary, month }) => {
             </TableRow>
             <TableRow>
               <TableCell className="font-medium text-left">
-                Working time deviation ({summary.deviationHours} hours @ {formatCurrency(calculatedHourlyRate)} /hour)
+                Working time deviation ({summary.deviationHours.toFixed(1)} hours @ {formatCurrency(calculatedHourlyRate)} /hour)
               </TableCell>
               <TableCell className="text-right">{formatCurrency(summary.deviationCost)}</TableCell>
             </TableRow>

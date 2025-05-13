@@ -1,4 +1,3 @@
-
 import { DayEntry, TimeReport } from "@/types/time-tracker";
 import { MonthSummary } from "@/types/time-tracker";
 
@@ -43,7 +42,7 @@ export const getWeekdaysInMonth = (year: number, month: number): Date[] => {
 };
 
 // Calculate expected hours in a month (with configurable hours per day)
-export const calculateExpectedHours = (year: number, month: number, hoursPerDay = 2): number => {
+export const calculateExpectedHours = (year: number, month: number, hoursPerDay = 8): number => {
   return getWeekdaysInMonth(year, month).length * hoursPerDay;
 };
 
@@ -144,9 +143,9 @@ export const calculateMonthSummary = (
   const uniqueProjects = [...new Set(entries.map(entry => entry.projectId))];
   const projectCount = uniqueProjects.length || 1;
   
-  // Calculate contracted hours based on 2h per day per project
-  const weekdaysInMonth = getWeekdaysInMonth(year, month);
-  const contractedHoursValue = weekdaysInMonth.length * 2 * projectCount;
+  // Calculate contracted hours based on 8h per day per all projects or 2h per day for specific project
+  const weekdaysInMonth = getWeekdaysInMonth(year, month).length;
+  const contractedHoursValue = weekdaysInMonth * 8;  // For all projects: 8 hours per weekday
   
   // Use provided expected hours or calculate based on contracted hours
   const effectiveExpectedHours = expectedHours !== undefined ? expectedHours : contractedHoursValue;

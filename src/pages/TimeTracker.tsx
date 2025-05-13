@@ -322,7 +322,7 @@ const TimeTracker = () => {
     : calculateExpectedHours(
         currentMonth.getFullYear(), 
         currentMonth.getMonth(),
-        8 / projectCount  // Divide 8 hours per day by number of projects
+        2  // 2 hours per day for specific project
       );
   
   const reportedHours = calculateReportedHours(currentMonthEntries);
