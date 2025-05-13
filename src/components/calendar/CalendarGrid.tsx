@@ -26,7 +26,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({ month, entries, onSelectDay
   if (isMobile) {
     return (
       <div className="flex flex-col gap-2">
-        <div className="grid grid-cols-7 gap-2">
+        <div className="grid grid-cols-7 gap-3">
           {dayLabels.map((day) => (
             <DayHeader key={day} day={day} />
           ))}
@@ -34,7 +34,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({ month, entries, onSelectDay
         
         <div className="flex flex-col gap-4">
           {Array.from({ length: Math.ceil(calendar.length / 7) }).map((_, weekIndex) => (
-            <div key={`week-${weekIndex}`} className="grid grid-cols-7 gap-2">
+            <div key={`week-${weekIndex}`} className="grid grid-cols-7 gap-3">
               {calendar.slice(weekIndex * 7, weekIndex * 7 + 7).map((day, dayIndex) => (
                 <DayCard
                   key={`day-${weekIndex}-${dayIndex}`}
@@ -53,14 +53,14 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({ month, entries, onSelectDay
   
   // Desktop view with wider spacing to prevent overlapping
   return (
-    <div className="w-full">
-      <div className="grid grid-cols-7 gap-2 mb-2">
+    <div className="w-full max-w-full overflow-x-auto">
+      <div className="grid grid-cols-7 gap-3 mb-3">
         {dayLabels.map((day) => (
           <DayHeader key={day} day={day} />
         ))}
       </div>
       
-      <div className="grid grid-cols-7 gap-2">
+      <div className="grid grid-cols-7 gap-3">
         {calendar.map((day, index) => (
           <DayCard
             key={`day-${index}`}

@@ -1,4 +1,3 @@
-
 import React from "react";
 import { DayEntry, CheckInStatus } from "@/types/time-tracker";
 import { Badge } from "@/components/ui/badge";
@@ -30,7 +29,7 @@ export const DayCard: React.FC<DayCardProps> = ({ day, month, entries, onSelectD
   
   if (day === null) {
     return (
-      <Card className="invisible rounded-md flex flex-col p-2 relative min-h-[160px]">
+      <Card className="invisible rounded-md flex flex-col p-2 relative h-[130px]">
         <CardContent className="p-0"></CardContent>
       </Card>
     );
@@ -79,12 +78,8 @@ export const DayCard: React.FC<DayCardProps> = ({ day, month, entries, onSelectD
 
   let cardClasses = "rounded-md flex flex-col p-2 relative";
   
-  // Adjust height based on mobile view
-  if (isMobile) {
-    cardClasses += " min-h-[120px]";
-  } else {
-    cardClasses += " aspect-square min-h-[160px]";
-  }
+  // Set a fixed height for all cards to prevent sizing issues
+  cardClasses += " h-[130px]";
   
   if (isToday) {
     cardClasses += " ring-2 ring-proxify-blue";
@@ -113,12 +108,12 @@ export const DayCard: React.FC<DayCardProps> = ({ day, month, entries, onSelectD
         </div>
         
         {dayEntries.length > 0 && dayEntries.some(e => e.status === "worked") && (
-          <div className="mt-2 text-center relative">
+          <div className="mt-1 text-center">
             <span className="text-lg font-bold text-black">{totalHours}h</span>
             
             {dayEntries.length > 1 && (
               <div className="flex items-center justify-center mt-1">
-                <BriefcaseIcon className="h-4 w-4 mr-1 text-gray-500 opacity-50" />
+                <BriefcaseIcon className="h-3 w-3 mr-1 text-gray-500 opacity-50" />
                 <span className="text-xs text-black">{dayEntries.length} projects</span>
               </div>
             )}
@@ -126,7 +121,7 @@ export const DayCard: React.FC<DayCardProps> = ({ day, month, entries, onSelectD
             {/* Underreported hours indicator in orange */}
             {lessHours && (
               <div className="flex items-center justify-center mt-1">
-                <AlertTriangleIcon className="h-4 w-4 mr-1 text-orange-500 opacity-70" />
+                <AlertTriangleIcon className="h-3 w-3 mr-1 text-orange-500 opacity-70" />
                 <span className="text-xs text-orange-500">Underreported</span>
               </div>
             )}

@@ -14,12 +14,14 @@ const Calendar: React.FC<CalendarProps> = ({ month, entries, onSelectDay }) => {
   const isMobile = useIsMobile();
   
   return (
-    <CalendarGrid 
-      month={month} 
-      entries={entries} 
-      onSelectDay={onSelectDay} 
-      isMobile={isMobile}
-    />
+    <div className="w-full">
+      <CalendarGrid 
+        month={month} 
+        entries={entries} 
+        onSelectDay={onSelectDay} 
+        isMobile={isMobile}
+      />
+    </div>
   );
 };
 
