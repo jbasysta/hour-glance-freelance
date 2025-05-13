@@ -1,4 +1,3 @@
-
 import React from "react";
 import { DayEntry, CheckInStatus } from "@/types/time-tracker";
 import { Badge } from "@/components/ui/badge";
@@ -58,11 +57,11 @@ const Calendar: React.FC<CalendarProps> = ({ month, entries, onSelectDay }) => {
 
   const getStatusIcon = (status: CheckInStatus) => {
     switch (status) {
-      case "worked": return <CheckIcon className="h-3.5 w-3.5" />;
-      case "missed": return <XIcon className="h-3.5 w-3.5" />;
-      case "day-off": return <CalendarIcon className="h-3.5 w-3.5" />;
-      case "suspended-client": return <ClockIcon className="h-3.5 w-3.5" />;
-      default: return <InfoIcon className="h-3.5 w-3.5" />;
+      case "worked": return <CheckIcon className="h-3.5 w-3.5 text-white" />;
+      case "missed": return <XIcon className="h-3.5 w-3.5 text-white" />;
+      case "day-off": return <CalendarIcon className="h-3.5 w-3.5 text-gray-600" />;
+      case "suspended-client": return <ClockIcon className="h-3.5 w-3.5 text-black" />;
+      default: return <InfoIcon className="h-3.5 w-3.5 text-gray-600" />;
     }
   };
 
@@ -148,19 +147,19 @@ const Calendar: React.FC<CalendarProps> = ({ month, entries, onSelectDay }) => {
               <div className="flex justify-between items-start">
                 <span className="font-medium text-black">{day}</span>
                 {(dayEntries.length > 0 || isMissed) && (
-                  <HoverCard>
+                  <HoverCard openDelay={100} closeDelay={200}>
                     <HoverCardTrigger asChild>
                       <div className="cursor-help">
                         {isMissed && dayEntries.length === 0 ? (
-                          <Badge className="bg-red-500 text-white">
+                          <Badge className="bg-red-500 text-white opacity-90">
                             <XIcon className="h-3.5 w-3.5" />
                           </Badge>
                         ) : dayEntries.length > 0 && statuses.length === 1 ? (
-                          <Badge className={getStatusColor(statuses[0])}>
+                          <Badge className={`${getStatusColor(statuses[0])} opacity-90`}>
                             {getStatusIcon(statuses[0])}
                           </Badge>
                         ) : (
-                          <Badge className="bg-proxify-blue text-white">
+                          <Badge className="bg-proxify-blue text-white opacity-90">
                             <BriefcaseIcon className="h-3.5 w-3.5" />
                           </Badge>
                         )}
@@ -172,10 +171,10 @@ const Calendar: React.FC<CalendarProps> = ({ month, entries, onSelectDay }) => {
                         {dayEntries.length === 0 && isMissed ? (
                           <p className="text-sm">Missed workday</p>
                         ) : (
-                          <>
+                          <div className="space-y-3">
                             {dayEntries.map((entry, i) => (
-                              <div key={i} className="border-b border-gray-100 pb-2 last:border-0 last:pb-0">
-                                <div className="flex justify-between items-center">
+                              <div key={i} className="border-b border-gray-100 pb-2 last:border-0 last:pb-0 flex flex-col">
+                                <div className="flex justify-between items-start">
                                   <span className="font-medium text-sm">{entry.projectName}</span>
                                   <Badge className={getStatusColor(entry.status)} variant="outline">
                                     {entry.status}
@@ -191,7 +190,7 @@ const Calendar: React.FC<CalendarProps> = ({ month, entries, onSelectDay }) => {
                                 )}
                               </div>
                             ))}
-                          </>
+                          </div>
                         )}
                       </div>
                     </HoverCardContent>
@@ -204,17 +203,17 @@ const Calendar: React.FC<CalendarProps> = ({ month, entries, onSelectDay }) => {
                   <span className="text-lg font-bold text-black">{totalHours}h</span>
                   
                   {dayEntries.length > 1 && (
-                    <div className="flex items-center justify-center mt-1 text-black">
-                      <BriefcaseIcon className="h-4 w-4 mr-1" />
-                      <span className="text-xs">{dayEntries.length} projects</span>
+                    <div className="flex items-center justify-center mt-1">
+                      <BriefcaseIcon className="h-4 w-4 mr-1 text-gray-500" />
+                      <span className="text-xs text-black">{dayEntries.length} projects</span>
                     </div>
                   )}
                   
                   {/* Add indicator for less than expected hours */}
                   {lessHours && (
-                    <div className="flex items-center justify-center mt-1 text-proxify-yellow">
-                      <AlertTriangleIcon className="h-4 w-4 mr-1" />
-                      <span className="text-xs">Underreported</span>
+                    <div className="flex items-center justify-center mt-1">
+                      <AlertTriangleIcon className="h-4 w-4 mr-1 text-proxify-yellow" />
+                      <span className="text-xs text-black">Underreported</span>
                     </div>
                   )}
                 </div>
@@ -224,7 +223,7 @@ const Calendar: React.FC<CalendarProps> = ({ month, entries, onSelectDay }) => {
                 <Button 
                   variant="ghost" 
                   size="sm" 
-                  className="mt-auto w-full justify-center hover:bg-proxify-lavender/10 hover:text-proxify-blue"
+                  className="mt-auto w-full justify-center text-proxify-blue bg-proxify-lavender/10 hover:bg-proxify-blue hover:text-white"
                   onClick={() => date && onSelectDay(date)}
                   disabled={isFuture}
                 >

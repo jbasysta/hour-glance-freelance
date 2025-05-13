@@ -13,31 +13,31 @@ const TimeReportStatus: React.FC<TimeReportStatusProps> = ({ status }) => {
     switch (status) {
       case "approved":
         return {
-          color: "bg-proxify-green text-white hover:bg-proxify-green/90",
+          color: "bg-proxify-green text-white",
           icon: <Check className="h-3.5 w-3.5 mr-1" />,
           label: "Approved"
         };
       case "upcoming":
         return {
-          color: "bg-proxify-blue text-white hover:bg-proxify-blue/90",
+          color: "bg-proxify-blue text-white",
           icon: <CalendarArrowDown className="h-3.5 w-3.5 mr-1" />,
           label: "Upcoming"
         };
       case "declined":
         return {
-          color: "bg-red-500 text-white hover:bg-red-600",
+          color: "bg-red-500 text-white",
           icon: <X className="h-3.5 w-3.5 mr-1" />,
           label: "Declined"
         };
       case "pending-approval":
         return {
-          color: "bg-proxify-yellow text-black hover:bg-proxify-yellow/90",
-          icon: <Loader className="h-3.5 w-3.5 mr-1 animate-spin" />,
+          color: "bg-proxify-yellow text-black",
+          icon: <Loader className="h-3.5 w-3.5 mr-1" />, // Removed animation
           label: "Pending Approval"
         };
       default:
         return {
-          color: "bg-gray-100 text-gray-800 hover:bg-gray-200",
+          color: "bg-gray-100 text-gray-800",
           icon: null,
           label: "Unknown"
         };
@@ -47,7 +47,7 @@ const TimeReportStatus: React.FC<TimeReportStatusProps> = ({ status }) => {
   const { color, icon, label } = getStatusDetails();
 
   return (
-    <Badge className={`flex items-center ${color}`} variant="outline">
+    <Badge className={`flex items-center ${color}`}>
       {icon}
       {label}
     </Badge>
