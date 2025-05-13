@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -19,6 +20,14 @@ export default {
 		},
 		extend: {
 			colors: {
+				proxify: {
+					lavender: "#D1B3FF",
+					green: "#39D87D",
+					yellow: "#F8C869",
+					blue: "#5258FB",
+					"lavender-light": "#F8F5FE",
+					"green-light": "#C4F3D8",
+				},
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
@@ -89,6 +98,9 @@ export default {
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out'
+			},
+			backgroundImage: {
+				'gradient-proxify': 'linear-gradient(90deg, #39D87D 0%, #5258FB 100%)',
 			}
 		}
 	},

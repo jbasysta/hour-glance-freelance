@@ -13,25 +13,25 @@ const TimeReportStatus: React.FC<TimeReportStatusProps> = ({ status }) => {
     switch (status) {
       case "approved":
         return {
-          color: "bg-green-100 text-green-800 hover:bg-green-200",
+          color: "bg-proxify-green text-white hover:bg-proxify-green/90",
           icon: <Check className="h-3.5 w-3.5 mr-1" />,
           label: "Approved"
         };
       case "upcoming":
         return {
-          color: "bg-blue-100 text-blue-800 hover:bg-blue-200",
+          color: "bg-proxify-blue text-white hover:bg-proxify-blue/90",
           icon: <CalendarArrowDown className="h-3.5 w-3.5 mr-1" />,
           label: "Upcoming"
         };
       case "declined":
         return {
-          color: "bg-red-100 text-red-800 hover:bg-red-200",
+          color: "bg-red-500 text-white hover:bg-red-600",
           icon: <X className="h-3.5 w-3.5 mr-1" />,
           label: "Declined"
         };
       case "pending-approval":
         return {
-          color: "bg-amber-100 text-amber-800 hover:bg-amber-200",
+          color: "bg-proxify-yellow text-black hover:bg-proxify-yellow/90",
           icon: <Loader className="h-3.5 w-3.5 mr-1 animate-spin" />,
           label: "Pending Approval"
         };

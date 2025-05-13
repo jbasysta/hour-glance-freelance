@@ -1,3 +1,4 @@
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -12,10 +13,10 @@
   transition: filter 300ms;
 }
 .logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+  filter: drop-shadow(0 0 2em rgba(82, 88, 251, 0.67));
 }
 .logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+  filter: drop-shadow(0 0 2em rgba(57, 216, 125, 0.67));
 }
 
 @keyframes logo-spin {
@@ -39,4 +40,41 @@
 
 .read-the-docs {
   color: #888;
+}
+
+/* Proxify brand color utilities */
+.bg-proxify-gradient {
+  background: linear-gradient(90deg, #39D87D 0%, #5258FB 100%);
+}
+
+.text-proxify-blue {
+  color: #5258FB;
+}
+
+.text-proxify-green {
+  color: #39D87D;
+}
+
+.text-proxify-lavender {
+  color: #D1B3FF;
+}
+
+.text-proxify-yellow {
+  color: #F8C869;
+}
+
+.border-proxify-blue {
+  border-color: #5258FB;
+}
+
+.border-proxify-green {
+  border-color: #39D87D;
+}
+
+.border-proxify-lavender {
+  border-color: #D1B3FF;
+}
+
+.border-proxify-yellow {
+  border-color: #F8C869;
 }

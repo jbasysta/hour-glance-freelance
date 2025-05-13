@@ -35,11 +35,11 @@ const Calendar: React.FC<CalendarProps> = ({ month, entries, onSelectDay }) => {
   
   const getStatusColor = (status: CheckInStatus): string => {
     switch (status) {
-      case "worked": return "bg-green-500";
-      case "missed": return "bg-red-500";
-      case "day-off": return "bg-gray-300";
-      case "suspended-client": return "bg-yellow-500";
-      default: return "bg-gray-200";
+      case "worked": return "bg-proxify-green text-white";
+      case "missed": return "bg-red-500 text-white";
+      case "day-off": return "bg-gray-300 text-gray-800";
+      case "suspended-client": return "bg-proxify-yellow text-gray-800";
+      default: return "bg-gray-200 text-gray-800";
     }
   };
 
@@ -54,7 +54,7 @@ const Calendar: React.FC<CalendarProps> = ({ month, entries, onSelectDay }) => {
     let classes = "aspect-square rounded-md flex flex-col p-2 relative";
     
     if (isToday) {
-      classes += " ring-2 ring-primary";
+      classes += " ring-2 ring-proxify-blue";
     }
     
     if (isWeekend) {
@@ -82,7 +82,7 @@ const Calendar: React.FC<CalendarProps> = ({ month, entries, onSelectDay }) => {
   return (
     <div className="grid grid-cols-7 gap-1">
       {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
-        <div key={day} className="text-center font-medium py-2">
+        <div key={day} className="text-center font-medium py-2 text-proxify-blue">
           {day}
         </div>
       ))}
@@ -114,16 +114,16 @@ const Calendar: React.FC<CalendarProps> = ({ month, entries, onSelectDay }) => {
                   </Badge>
                 )}
                 {dayEntries.length > 0 && statuses.length > 1 && (
-                  <Badge className="bg-blue-500">multiple</Badge>
+                  <Badge className="bg-proxify-blue text-white">multiple</Badge>
                 )}
               </div>
               
               {dayEntries.length > 0 && dayEntries.some(e => e.status === "worked") && (
                 <div className="mt-2 text-center relative">
-                  <span className="text-lg font-bold">{totalHours}h</span>
+                  <span className="text-lg font-bold text-proxify-blue">{totalHours}h</span>
                   
                   {dayEntries.length > 1 && (
-                    <div className="flex items-center justify-center mt-1 text-blue-600">
+                    <div className="flex items-center justify-center mt-1 text-proxify-blue">
                       <BriefcaseIcon className="h-4 w-4 mr-1" />
                       <span className="text-xs">{dayEntries.length} projects</span>
                     </div>
@@ -131,7 +131,7 @@ const Calendar: React.FC<CalendarProps> = ({ month, entries, onSelectDay }) => {
                   
                   {/* Add indicator for less than expected hours */}
                   {lessHours && (
-                    <div className="flex items-center justify-center mt-1 text-amber-600">
+                    <div className="flex items-center justify-center mt-1 text-proxify-yellow">
                       <AlertTriangleIcon className="h-4 w-4 mr-1" />
                       <span className="text-xs">Underreported</span>
                     </div>
@@ -143,7 +143,7 @@ const Calendar: React.FC<CalendarProps> = ({ month, entries, onSelectDay }) => {
                 <Button 
                   variant="ghost" 
                   size="sm" 
-                  className="mt-auto w-full justify-center"
+                  className="mt-auto w-full justify-center hover:bg-proxify-lavender/10 hover:text-proxify-blue"
                   onClick={() => date && onSelectDay(date)}
                   disabled={isFuture}
                 >
