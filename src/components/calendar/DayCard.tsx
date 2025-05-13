@@ -32,7 +32,7 @@ export const DayCard: React.FC<DayCardProps> = ({ day, month, entries, onSelectD
   
   if (day === null) {
     return (
-      <Card className="invisible rounded-md flex flex-col p-2 relative h-[130px] border border-gray-300">
+      <Card className="invisible rounded-md flex flex-col p-2 relative h-[130px]">
         <CardContent className="p-0"></CardContent>
       </Card>
     );
@@ -88,7 +88,7 @@ export const DayCard: React.FC<DayCardProps> = ({ day, month, entries, onSelectD
     return dayEntries.length === 0 || dayEntries.every(entry => entry.status === "missed");
   }
 
-  let cardClasses = "rounded-md flex flex-col p-2 relative border-2 border-gray-300";
+  let cardClasses = "rounded-md flex flex-col p-2 relative";
   
   // Set a fixed height for all cards to prevent sizing issues
   cardClasses += " h-[130px]";
