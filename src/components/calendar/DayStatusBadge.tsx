@@ -7,7 +7,8 @@ import {
   CheckIcon,
   XIcon,
   ClockIcon,
-  CalendarIcon
+  CalendarIcon,
+  SunIcon
 } from "lucide-react";
 import {
   HoverCard,
@@ -34,33 +35,56 @@ export const DayStatusBadge: React.FC<DayStatusBadgeProps> = ({
     }
   };
 
-  const getStatusIcon = (status: CheckInStatus) => {
-    switch (status) {
-      case "worked": return <CheckIcon className="h-3.5 w-3.5 text-white opacity-50" />;
-      case "missed": return <XIcon className="h-3.5 w-3.5 text-white opacity-50" />;
-      case "day-off": return <CalendarIcon className="h-3.5 w-3.5 text-gray-600 opacity-50" />;
-      case "suspended-client": return <ClockIcon className="h-3.5 w-3.5 text-black opacity-50" />;
-      default: return <BriefcaseIcon className="h-3.5 w-3.5 text-gray-600 opacity-50" />;
+  // New function to determine which icon to show based on the updated logic
+  const getDayStatusDetails = () => {
+    // If no entries and isMissed flag is true, show Missed icon
+    if (dayEntries.length === 0 && isMissed) {
+      return {
+        color: "bg-red-500 text-white",
+        icon: <XIcon className="h-3.5 w-3.5 opacity-50" />
+      };
     }
+    
+    // If any entry has "day-off" status, show Day Off icon
+    if (dayEntries.some(entry => entry.status === "day-off")) {
+      return {
+        color: "bg-gray-300 text-gray-800",
+        icon: <SunIcon className="h-3.5 w-3.5 text-gray-600 opacity-50" />
+      };
+    }
+    
+    // If all entries are missed, show Missed icon
+    if (dayEntries.length > 0 && dayEntries.every(entry => entry.status === "missed")) {
+      return {
+        color: "bg-red-500 text-white", 
+        icon: <XIcon className="h-3.5 w-3.5 text-white opacity-50" />
+      };
+    }
+    
+    // For days with worked hours (not all missed)
+    if (dayEntries.some(entry => entry.status === "worked")) {
+      return {
+        color: "bg-proxify-green text-white",
+        icon: <CheckIcon className="h-3.5 w-3.5 text-white opacity-50" />
+      };
+    }
+    
+    // Default case (including suspended-client)
+    return {
+      color: "bg-proxify-blue text-white",
+      icon: <BriefcaseIcon className="h-3.5 w-3.5 opacity-50" />
+    };
   };
+
+  const { color, icon } = getDayStatusDetails();
 
   return (
     <HoverCard openDelay={100} closeDelay={100}>
       <HoverCardTrigger asChild>
         <div className="cursor-help">
-          {isMissed && dayEntries.length === 0 ? (
-            <Badge className="bg-red-500 text-white opacity-90">
-              <XIcon className="h-3.5 w-3.5 opacity-50" />
-            </Badge>
-          ) : dayEntries.length > 0 && statuses.length === 1 ? (
-            <Badge className={`${getStatusColor(statuses[0])} opacity-90`}>
-              {getStatusIcon(statuses[0])}
-            </Badge>
-          ) : (
-            <Badge className="bg-proxify-blue text-white opacity-90">
-              <BriefcaseIcon className="h-3.5 w-3.5 opacity-50" />
-            </Badge>
-          )}
+          <Badge className={`${color} opacity-90`}>
+            {icon}
+          </Badge>
         </div>
       </HoverCardTrigger>
       <HoverCardContent className="w-80 p-4">

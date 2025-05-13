@@ -32,7 +32,7 @@ const TimeReportStatus: React.FC<TimeReportStatusProps> = ({ status }) => {
       case "pending-approval":
         return {
           color: "bg-proxify-yellow text-black",
-          icon: <Loader className="h-3.5 w-3.5 mr-1" />, // Removed animation
+          icon: <Loader className="h-3.5 w-3.5 mr-1" />,
           label: "Pending Approval"
         };
       default:
