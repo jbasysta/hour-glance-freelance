@@ -8,7 +8,7 @@ import {
   XIcon,
   CalendarMinusIcon,
   ClockIcon,
-  ClockOffIcon
+  ClockAlert
 } from "lucide-react";
 import {
   HoverCard,
@@ -77,7 +77,7 @@ export const DayStatusBadge: React.FC<DayStatusBadgeProps> = ({
     if (dayEntries.length > 0 && dayEntries.every(entry => entry.status === "suspended-client")) {
       return {
         color: "bg-proxify-yellow text-black",
-        icon: <ClockOffIcon className="h-3.5 w-3.5 text-black opacity-50" />,
+        icon: <ClockAlert className="h-3.5 w-3.5 text-black opacity-50" />,
         label: "Suspended"
       };
     }
