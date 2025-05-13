@@ -32,7 +32,7 @@ const TimeEntryForm: React.FC<TimeEntryFormProps> = ({
 }) => {
   const [hours, setHours] = React.useState<number>(existingEntry?.hours || 8);
   const [status, setStatus] = React.useState<CheckInStatus>(
-    existingEntry?.status || (isWeekday(date!) ? "worked" : "day-off")
+    existingEntry?.status || (date ? (isWeekday(date) ? "worked" : "day-off") : "worked")
   );
 
   React.useEffect(() => {

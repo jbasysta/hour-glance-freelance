@@ -1,8 +1,10 @@
 
 import { DayEntry } from "@/types/time-tracker";
+import { MonthSummary } from "@/types/time-tracker";
 
 // Check if date is a weekday (Monday-Friday)
-export const isWeekday = (date: Date): boolean => {
+export const isWeekday = (date: Date | null): boolean => {
+  if (!date) return false; // Handle null date case
   const day = date.getDay();
   return day >= 1 && day <= 5; // 0 is Sunday, 6 is Saturday
 };
