@@ -10,6 +10,7 @@ interface CalendarGridProps {
   onSelectDay: (date: Date) => void;
   isMobile?: boolean;
   reportStatus: ReportStatus;
+  showDayLabels?: boolean; // Add a prop to control showing day labels
   children?: (day: number | null, dayIndex: number) => React.ReactNode;
 }
 
@@ -19,6 +20,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
   onSelectDay, 
   isMobile = false,
   reportStatus,
+  showDayLabels = true, // Default to showing day labels
   children 
 }) => {
   const daysInMonth = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
@@ -35,11 +37,13 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
   if (isMobile) {
     return (
       <div className="flex flex-col gap-2">
-        <div className="grid grid-cols-7 gap-3">
-          {dayLabels.map((day) => (
-            <DayHeader key={day} day={day} />
-          ))}
-        </div>
+        {showDayLabels && (
+          <div className="grid grid-cols-7 gap-3">
+            {dayLabels.map((day) => (
+              <DayHeader key={day} day={day} />
+            ))}
+          </div>
+        )}
         
         <div className="flex flex-col gap-4">
           {Array.from({ length: Math.ceil(calendar.length / 7) }).map((_, weekIndex) => (
@@ -66,11 +70,13 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
   // Desktop view with wider spacing to prevent overlapping
   return (
     <div className="w-full max-w-full overflow-x-auto">
-      <div className="grid grid-cols-7 gap-3 mb-3">
-        {dayLabels.map((day) => (
-          <DayHeader key={day} day={day} />
-        ))}
-      </div>
+      {showDayLabels && (
+        <div className="grid grid-cols-7 gap-3 mb-3">
+          {dayLabels.map((day) => (
+            <DayHeader key={day} day={day} />
+          ))}
+        </div>
+      )}
       
       <div className="grid grid-cols-7 gap-3">
         {calendar.map((day, index) => (

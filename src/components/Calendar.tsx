@@ -31,6 +31,7 @@ const Calendar: React.FC<CalendarProps> = ({ month, entries, onSelectDay, report
         entries={entries}
         onSelectDay={onSelectDay}
         reportStatus={reportStatus}
+        showDayLabels={false} // Turn off day labels in the grid since we're showing them above
       >
         {(day, dayIndex) => (
           <DayCard 

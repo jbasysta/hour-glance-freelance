@@ -135,14 +135,12 @@ export const DayCard: React.FC<DayCardProps> = ({ day, month, entries, onSelectD
         {shouldShowHours && (
           <div className="mt-1 text-center">
             <div className="flex items-center justify-center">
-              <span className="text-lg font-bold text-black">{totalHours}h</span>
-              
-              {/* Add the warning icon for less than 8 hours */}
+              {/* Add the warning icon before the hours if less than 8 hours */}
               {isLessThan8Hours && (
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <div className="ml-1 cursor-help">
+                      <div className="mr-1 cursor-help">
                         <AlertTriangleIcon className="h-4 w-4 text-amber-500" />
                       </div>
                     </TooltipTrigger>
@@ -152,6 +150,7 @@ export const DayCard: React.FC<DayCardProps> = ({ day, month, entries, onSelectD
                   </Tooltip>
                 </TooltipProvider>
               )}
+              <span className="text-lg font-bold text-black">{totalHours}h</span>
             </div>
             
             {/* Underreported hours indicator in orange */}
